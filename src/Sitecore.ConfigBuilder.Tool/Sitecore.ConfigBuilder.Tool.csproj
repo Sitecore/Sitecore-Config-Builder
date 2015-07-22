@@ -38,11 +38,19 @@
     <ApplicationIcon>Images\icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
+    </Reference>
     <Reference Include="Sitecore.Diagnostics.Base">
       <HintPath>..\packages\Sitecore.Diagnostics.Base.1.0.0.14\lib\net35\Sitecore.Diagnostics.Base.dll</HintPath>
     </Reference>
     <Reference Include="Sitecore.Diagnostics.ConfigBuilder">
       <HintPath>..\packages\Sitecore.Diagnostics.ConfigBuilder.1.0.0.11\lib\net35\Sitecore.Diagnostics.ConfigBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Diagnsotics.InformationService.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Sitecore.Diagnsotics.InformationService.Client.1.0.0.42\lib\net35\Sitecore.Diagnsotics.InformationService.Client.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

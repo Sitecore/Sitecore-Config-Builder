@@ -3,11 +3,14 @@
   using System;
   using System.Diagnostics;
   using System.IO;
+  using System.Linq;
   using System.Reflection;
   using System.Windows.Forms;
+  using System.Xml.Linq;
   using Sitecore.Diagnostics;
   using Sitecore.Diagnostics.Annotations;
   using Sitecore.Diagnostics.ConfigBuilder;
+  using Sitecore.Diagnsotics.InformationService.Client;
 
   internal partial class MainForm : Form
   {
@@ -53,13 +56,48 @@
         }
 
         Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputFile, false, normalizeOutput);
-
+        
         if (buildWebConfigResult)
         {
           outputFile = this.GetShowConfigFilePath(WebConfigResultFileName);
           Assert.IsNotNull(outputFile, "outputFile");
 
           Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputFile, true, normalizeOutput);
+        }
+
+        var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
+        if (requireDefaultConfiguration)
+        {
+          var version = this.SitecoreVersionComboBox.Text;
+          if (!string.IsNullOrEmpty(version))
+          {
+            try
+            {
+              var tempFolder = SitecoreVersions.DownloadDefaultConfigurationFiles(version);
+              try
+              {
+                if (tempFolder.Exists)
+                {
+                  Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputFile + "." + version + ".xml", false, normalizeOutput);
+                  if (buildWebConfigResult)
+                  {
+                    Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputFile + "." + version + ".xml", true, normalizeOutput);
+                  }
+                }
+              }
+              finally
+              {
+                if (tempFolder.Exists)
+                {
+                  tempFolder.Delete();
+                }
+              }
+            }
+            catch (Exception ex)
+            {
+              // Log.Error()
+            }
+          }
         }
 
         if (this.OpenFolder.Checked && File.Exists(outputFile))
@@ -88,10 +126,10 @@
       if (!this.NoDestinationPrompt.Checked)
       {
         var fileDialog = new SaveFileDialog
-        {
-          FileName = fileName,
-          Filter = SaveFilter
-        };
+      {
+        FileName = fileName,
+        Filter = SaveFilter
+      };
 
         if (fileDialog.ShowDialog(this) != DialogResult.OK)
         {
@@ -170,16 +208,41 @@
     {
       try
       {
+        new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
+
         this.ParseCommandLine();
 
         this.ReadSettings();
-        this.Text = string.Format(this.Text ?? string.Empty, GetVersion());     
+        this.Text = string.Format(this.Text ?? string.Empty, GetVersion());
       }
       catch (Exception ex)
       {
         MessageBox.Show("The form load failed with exception. " + ex.Message + Environment.NewLine + Environment.NewLine + "Find details in log file");
         File.AppendAllText("ConfigBuilder.Tool.exe.log", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + " ERROR " + ex.GetType().FullName + Environment.NewLine + "Message: " + ex.Message + Environment.NewLine + "Stack trace:" + Environment.NewLine + ex.StackTrace + Environment.NewLine);
       }
+    }
+
+    private void PopulateVersionsComboBox()
+    {
+      var comboBox = this.SitecoreVersionComboBox;
+
+      Action act = delegate
+      {
+        var versions = SitecoreVersions.GetVersions().ToArray();
+        comboBox.Items.AddRange(versions);
+        if (comboBox.Items.Count > 0)
+        {
+          comboBox.SelectedIndex = 0;
+        }
+      };
+
+      if (comboBox.InvokeRequired)
+      {
+        this.Invoke(act);
+        return;
+      }
+
+      act();
     }
 
     [NotNull]
@@ -219,16 +282,16 @@
       try
       {
         var boolParse = new Func<string[], int, bool>((p0, p1) =>
-        {
-          try
           {
-            return bool.Parse(p0[p1]);
-          }
-          catch (Exception)
-          {
-            return false;
-          }
-        });
+            try
+            {
+              return bool.Parse(p0[p1]);
+            }
+            catch (Exception)
+            {
+              return false;
+            }
+          });
 
         var settings = File.ReadAllText(SettingsFilePath).Split('|');
 
@@ -273,10 +336,71 @@
         return;
       }
 
+      var version = TryDetectSitecoreVersion(websiteFolderPath);
+      if (!string.IsNullOrEmpty(version))
+      {
+        foreach (var item in this.SitecoreVersionComboBox.Items)
+        {
+          if (item == null || item.ToString() != version)
+          {
+            continue;
+          }
+
+          this.SitecoreVersionComboBox.SelectedItem = item;
+          break;
+        }
+      }
+
       this.SaveButton.Enabled = true;
-      this.ErrorLabel.Text = @"Ready";      
+      this.ErrorLabel.Text = @"Ready";
     }
-    
+
+    [CanBeNull]
+    private string TryDetectSitecoreVersion([NotNull] string websiteFolderPath)
+    {
+      Assert.ArgumentNotNull(websiteFolderPath, "websiteFolderPath");
+
+      try
+      {
+        var filePath = Path.Combine(websiteFolderPath, "sitecore.version.xml");
+        if (!File.Exists(filePath))
+        {
+          var parentFolderPath = Path.GetDirectoryName(websiteFolderPath);
+          Assert.IsNotNull(parentFolderPath, "parentFolderPath");
+
+          filePath = Path.Combine(parentFolderPath, "sitecore.version.xml");
+          if (!File.Exists(filePath))
+          {
+            var shellFolderPath = Path.Combine(websiteFolderPath, "sitecore\\shell");
+            Assert.IsNotNull(shellFolderPath, "shellFolderPath");
+
+            filePath = Path.Combine(shellFolderPath, "sitecore.version.xml");
+            if (!File.Exists(filePath))
+            {
+              return null;
+            }
+          }
+        }
+
+
+        var doc = XDocument.Load(filePath);
+        Assert.IsNotNull(doc, "doc");
+
+        var major = doc.Descendants("major").FirstOrDefault().Value;
+        var minor = doc.Descendants("minor").FirstOrDefault().Value;
+        var build = doc.Descendants("build").FirstOrDefault().Value;
+        var revision = doc.Descendants("revision").FirstOrDefault().Value;
+        var version = major + "." + minor + (string.IsNullOrEmpty(build) ? "" : ("." + build)) + " rev. " + revision;
+
+        return version;
+      }
+      catch
+      {
+      }
+
+      return null;
+    }
+
     private void SaveSettings([CanBeNull] object sender, [CanBeNull] EventArgs e)
     {
       if (!Directory.Exists(AppDataFolderPath))
