@@ -1,0 +1,9 @@
+trash/
+src/SIS.Client/obj/
+src/SIS.Client/bin/
+src/Tool/obj/
+src/Sitecore.Diagnsotics.InformationService.Client/obj/
+src/Sitecore.Diagnsotics.InformationService.Client/bin/
+*.suo
+src/packages/
+src/Sitecore.ConfigBuilder.Tool/obj/
