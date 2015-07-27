@@ -11,6 +11,8 @@
   using Sitecore.Diagnostics.Annotations;
   using Sitecore.Diagnostics.ConfigBuilder;
   using Sitecore.Diagnsotics.InformationService.Client;
+  using System.Collections.Generic;
+  using System.Runtime.Remoting.Messaging;
 
   internal partial class MainForm : Form
   {
@@ -56,7 +58,7 @@
         }
 
         Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputFile, false, normalizeOutput);
-        
+
         if (buildWebConfigResult)
         {
           outputFile = this.GetShowConfigFilePath(WebConfigResultFileName);
@@ -208,7 +210,8 @@
     {
       try
       {
-        new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
+        //new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
+        new ToDoHandler(SitecoreVersions.GetVersions).BeginInvoke(PopulateVersionsComboBox, null);
 
         this.ParseCommandLine();
 
@@ -222,29 +225,34 @@
       }
     }
 
-    private void PopulateVersionsComboBox()
+    private void PopulateVersionsComboBox(IAsyncResult asyncRes)
     {
-      var comboBox = this.SitecoreVersionComboBox;
-
-      Action act = delegate
+      var result1 = (AsyncResult)asyncRes;
+      var result = ((ToDoHandler)result1.AsyncDelegate).EndInvoke(asyncRes);
+      Action method = delegate
       {
-        var versions = SitecoreVersions.GetVersions().ToArray();
-        comboBox.Items.AddRange(versions);
-        if (comboBox.Items.Count > 0)
+        if (result != null)
         {
-          comboBox.SelectedIndex = 0;
+          object[] items = result.Cast<object>().ToArray<object>();
+          this.SitecoreVersionComboBox.Items.AddRange(items);
+          if (this.SitecoreVersionComboBox.Items.Count > 0)
+          {
+            this.SitecoreVersionComboBox.SelectedIndex = 0;
+          }
         }
       };
-
-      if (comboBox.InvokeRequired)
+      if (this.SitecoreVersionComboBox.InvokeRequired)
       {
-        this.Invoke(act);
-        return;
+        base.Invoke(method);
       }
-
-      act();
+      else
+      {
+        method();
+      }
     }
 
+    private delegate IEnumerable<string> ToDoHandler();
+    
     [NotNull]
     private string GetVersion()
     {
