@@ -238,6 +238,10 @@
           if (this.SitecoreVersionComboBox.Items.Count > 0)
           {
             this.SitecoreVersionComboBox.SelectedIndex = 0;
+            if (this.FilePathTextbox.Text.Trim().Length > 0)
+            {
+              UpdateSaveButton();
+            }
           }
         }
       };
