@@ -13,6 +13,7 @@
   using Sitecore.Diagnsotics.InformationService.Client;
   using System.Collections.Generic;
   using System.Runtime.Remoting.Messaging;
+  using Microsoft.Win32;
 
   internal partial class MainForm : Form
   {
@@ -210,6 +211,8 @@
     {
       try
       {
+        UpdateMenuContextButton();
+
         //new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
         new ToDoHandler(SitecoreVersions.GetVersions).BeginInvoke(PopulateVersionsComboBox, null);
 
@@ -223,6 +226,25 @@
         MessageBox.Show("The form load failed with exception. " + ex.Message + Environment.NewLine + Environment.NewLine + "Find details in log file");
         File.AppendAllText("ConfigBuilder.Tool.exe.log", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + " ERROR " + ex.GetType().FullName + Environment.NewLine + "Message: " + ex.Message + Environment.NewLine + "Stack trace:" + Environment.NewLine + ex.StackTrace + Environment.NewLine);
       }
+    }
+
+    private void UpdateMenuContextButton()
+    {
+      var appPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sitecore.ConfigBuilder.Tool.exe");
+      var key = Registry.ClassesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
+      if (key != null)
+      {
+        key.SetValue("", "Open with Sitecore ConfigBuilder");
+        key.SetValue("Icon", appPath);
+        key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
+
+        var command = key.CreateSubKey("command");
+        if (command != null)
+        {
+          command.SetValue("", appPath + " %1");
+        }
+      }
+
     }
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
