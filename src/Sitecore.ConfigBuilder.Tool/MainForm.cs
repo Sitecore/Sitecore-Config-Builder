@@ -375,6 +375,7 @@
         this.NormalizeOutput.Checked = boolParse(settings, 2);
         this.NoDestinationPrompt.Checked = boolParse(settings, 3);
         this.BuildWebConfigResult.Checked = boolParse(settings, 4);
+        this.RequireDefaultConfiguration.Checked = boolParse(settings, 5);
       }
       catch (Exception)
       {
@@ -484,7 +485,7 @@
       }
 
       var file = Path.Combine(AppDataFolderPath, "Settings.txt");
-      var contents = string.Format("{0}|{1}|{2}|{3}|{4}|{5}", OpenFolder.Checked, CloseWhenDone.Checked, NormalizeOutput.Checked, NoDestinationPrompt.Checked, BuildShowConfig.Checked, BuildWebConfigResult.Checked);
+      var contents = string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}", OpenFolder.Checked, CloseWhenDone.Checked, NormalizeOutput.Checked, NoDestinationPrompt.Checked, BuildShowConfig.Checked, BuildWebConfigResult.Checked, RequireDefaultConfiguration.Checked);
       File.WriteAllText(file, contents);
     }
 
