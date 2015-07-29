@@ -44,6 +44,14 @@
 
     private void SaveButton_Click([CanBeNull] object sender, [CanBeNull] EventArgs e)
     {
+      this.SaveButton.Enabled = false;
+      Save();
+      UpdateSaveButton();
+      this.ErrorLabel.Text = @"Config-files are processed.";
+    }
+
+    private void Save()
+    {
       try
       {
         var webConfigPath = this.FilePathTextbox.Text;
@@ -51,27 +59,34 @@
 
         var buildWebConfigResult = this.BuildWebConfigResult.Checked;
         var normalizeOutput = this.NormalizeOutput.Checked;
+        var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
+        var version = this.SitecoreVersionComboBox.Text;
 
-        var outputFile = this.GetShowConfigFilePath(ShowconfigFileName);
-        if (string.IsNullOrEmpty(outputFile))
+        var outputShowConfigFile = this.GetShowConfigFilePath(ShowconfigFileName);
+
+        if (string.IsNullOrEmpty(outputShowConfigFile))
         {
           return;
         }
 
-        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputFile, false, normalizeOutput);
-
+        var outputWebConfigFile = string.Empty;
         if (buildWebConfigResult)
         {
-          outputFile = this.GetShowConfigFilePath(WebConfigResultFileName);
-          Assert.IsNotNull(outputFile, "outputFile");
-
-          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputFile, true, normalizeOutput);
+          outputWebConfigFile = this.GetShowConfigFilePath(WebConfigResultFileName);
+          Assert.IsNotNull(outputWebConfigFile, "outputWebConfigFile");
         }
 
-        var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
+        // GoTo Gunun national park, because in the issue-tracker and the goal-list there wasn't a progress bar in a box for downloading process!
+        /****************************************************/
+
+        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputShowConfigFile, buildWebConfigResult, normalizeOutput);
+        if (buildWebConfigResult)
+        {
+          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputWebConfigFile, buildWebConfigResult, normalizeOutput);
+        }
+
         if (requireDefaultConfiguration)
         {
-          var version = this.SitecoreVersionComboBox.Text;
           if (!string.IsNullOrEmpty(version))
           {
             try
@@ -81,10 +96,10 @@
               {
                 if (tempFolder.Exists)
                 {
-                  Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputFile + "." + version + ".xml", false, normalizeOutput);
+                  Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputShowConfigFile + "." + version + ".xml", buildWebConfigResult, normalizeOutput);
                   if (buildWebConfigResult)
                   {
-                    Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputFile + "." + version + ".xml", true, normalizeOutput);
+                    Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputWebConfigFile + "." + version + ".xml", buildWebConfigResult, normalizeOutput);
                   }
                 }
               }
@@ -102,10 +117,11 @@
             }
           }
         }
+        /****************************************************/
 
-        if (this.OpenFolder.Checked && File.Exists(outputFile))
+        if (this.OpenFolder.Checked && File.Exists(outputWebConfigFile))
         {
-          string argument = @"/select, """ + outputFile + @"""";
+          string argument = @"/select, """ + outputWebConfigFile + @"""";
           Process.Start("explorer.exe", argument);
         }
 
@@ -120,6 +136,7 @@
         File.AppendAllText("ConfigBuilder.ConfigBuilder.dll.log", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + " ERROR " + ex.GetType().FullName + Environment.NewLine + "Message: " + ex.Message + Environment.NewLine + "Stack trace:" + Environment.NewLine + ex.StackTrace + Environment.NewLine);
       }
     }
+
 
     [CanBeNull]
     private string GetShowConfigFilePath([NotNull] string fileName, [CanBeNull] string webConfigFilePath = null)
@@ -249,9 +266,9 @@
           return;
         }
       }
-      catch (System.Security.SecurityException sex) 
-      { 
-        throw new System.Security.SecurityException(@"Don't have read access to the registry: hkcr\*\shell\Sitecore.ConfigBuilder"); 
+      catch (System.Security.SecurityException sex)
+      {
+        throw new System.Security.SecurityException(@"Don't have read access to the registry: hkcr\*\shell\Sitecore.ConfigBuilder");
       }
 
       var key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
@@ -302,7 +319,7 @@
     }
 
     private delegate IEnumerable<string> ToDoHandler();
-    
+
     [NotNull]
     private string GetVersion()
     {

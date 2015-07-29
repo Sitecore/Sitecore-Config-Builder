@@ -94,7 +94,7 @@
       this.ActionsGroup.TabStop = false;
       this.ActionsGroup.Text = "STEP 4 – Actions";
       // 
-      // SitecoreCMSVersionBox
+      // SitecoreVersionComboBox
       // 
       this.SitecoreVersionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
       this.SitecoreVersionComboBox.FormattingEnabled = true;
