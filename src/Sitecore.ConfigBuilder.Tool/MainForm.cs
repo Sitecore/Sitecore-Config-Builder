@@ -230,8 +230,32 @@
 
     private void UpdateMenuContextButton()
     {
+
+      var classesRoot = Registry.ClassesRoot;
+
+      if (classesRoot == null)
+      {
+        return;
+      }
+
       var appPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sitecore.ConfigBuilder.Tool.exe");
-      var key = Registry.ClassesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
+
+      try
+      {
+        var key1 = classesRoot.OpenSubKey(@"*\shell\Sitecore.ConfigBuilder", RegistryKeyPermissionCheck.ReadSubTree);
+        if (key1 != null)
+        {
+          key1.Close();
+          return;
+        }
+      }
+      catch (System.Security.SecurityException sex) 
+      { 
+        throw new System.Security.SecurityException(@"Don't have read access to the registry: hkcr\*\shell\Sitecore.ConfigBuilder"); 
+      }
+
+      var key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
+
       if (key != null)
       {
         key.SetValue("", "Open with Sitecore ConfigBuilder");
@@ -278,7 +302,7 @@
     }
 
     private delegate IEnumerable<string> ToDoHandler();
-    
+
     [NotNull]
     private string GetVersion()
     {
