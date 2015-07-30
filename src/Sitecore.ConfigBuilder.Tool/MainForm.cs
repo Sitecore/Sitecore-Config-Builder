@@ -27,6 +27,8 @@
 
     private const string WebConfigResultFileName = "web.config.result.xml";
 
+    bool NeverAskMeAboutContextMenu = false;
+
     [NotNull]
     private static readonly string AppDataFolderPath = Environment.ExpandEnvironmentVariables("%APPDATA%\\Sitecore\\Sitecore.ConfigBuilder\\");
 
@@ -228,14 +230,11 @@
     {
       try
       {
+        this.ParseCommandLine();
+        this.ReadSettings();
         UpdateMenuContextButton();
-
         //new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
         new ToDoHandler(SitecoreVersions.GetVersions).BeginInvoke(PopulateVersionsComboBox, null);
-
-        this.ParseCommandLine();
-
-        this.ReadSettings();
         this.Text = string.Format(this.Text ?? string.Empty, GetVersion());
       }
       catch (Exception ex)
@@ -247,9 +246,7 @@
 
     private void UpdateMenuContextButton()
     {
-
       var classesRoot = Registry.ClassesRoot;
-
       if (classesRoot == null)
       {
         return;
@@ -266,26 +263,56 @@
           return;
         }
       }
-      catch (System.Security.SecurityException sex)
+      catch (Exception)
       {
         throw new System.Security.SecurityException(@"Don't have read access to the registry: hkcr\*\shell\Sitecore.ConfigBuilder");
       }
 
-      var key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
+      RegistryKey key = null;
+      try
+      {
+        classesRoot.CreateSubKey(@"*\shell\");
+      }
+      catch (Exception)
+      {
+        if (NeverAskMeAboutContextMenu)
+        {
+          return;
+        }
+        var msg = "Sitecore Config Builder can be embedded into Windows Explorer context menu as \"Open with Sitecore Config Builder\" for all \"web.config\" files in the system.\n" +
+          "If you want to enable this feature click Yes and re-run the application with Administrator privilegies.\n" +
+          "Click Cancel if you want to skip it for now or No if you don't want to see this message any longer.";
+        var result = MessageBox.Show(msg, "ConfigBuilder settings", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+        if (result == System.Windows.Forms.DialogResult.Yes)
+        {
+          Application.Exit();
+        }
+        else if (result == System.Windows.Forms.DialogResult.No)
+        {
+          NeverAskMeAboutContextMenu = true;
+        }
+        else if (result == System.Windows.Forms.DialogResult.Cancel)
+        {
+        }
+        return;
+      }
+      var msg1 = "Would you like to add an item into Windows Explorer context menu for all \"web.config\" files in the system?";
+      if (MessageBox.Show(msg1, "ConfigBuilder settings", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
+      {
+        key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
+      }
 
       if (key != null)
       {
         key.SetValue("", "Open with Sitecore ConfigBuilder");
         key.SetValue("Icon", appPath);
         key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
-
         var command = key.CreateSubKey("command");
         if (command != null)
         {
           command.SetValue("", appPath + " %1");
         }
       }
-
     }
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
@@ -374,8 +401,10 @@
         this.CloseWhenDone.Checked = boolParse(settings, 1);
         this.NormalizeOutput.Checked = boolParse(settings, 2);
         this.NoDestinationPrompt.Checked = boolParse(settings, 3);
-        this.BuildWebConfigResult.Checked = boolParse(settings, 4);
-        this.RequireDefaultConfiguration.Checked = boolParse(settings, 5);
+        this.BuildShowConfig.Checked = boolParse(settings, 4); 
+        this.BuildWebConfigResult.Checked = boolParse(settings, 5);
+        this.RequireDefaultConfiguration.Checked = boolParse(settings, 6);
+        this.NeverAskMeAboutContextMenu = boolParse(settings, 7);
       }
       catch (Exception)
       {
@@ -485,7 +514,15 @@
       }
 
       var file = Path.Combine(AppDataFolderPath, "Settings.txt");
-      var contents = string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}", OpenFolder.Checked, CloseWhenDone.Checked, NormalizeOutput.Checked, NoDestinationPrompt.Checked, BuildShowConfig.Checked, BuildWebConfigResult.Checked, RequireDefaultConfiguration.Checked);
+      var contents = string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|", 
+        OpenFolder.Checked, 
+        CloseWhenDone.Checked, 
+        NormalizeOutput.Checked, 
+        NoDestinationPrompt.Checked, 
+        BuildShowConfig.Checked, 
+        BuildWebConfigResult.Checked, 
+        RequireDefaultConfiguration.Checked,
+        NeverAskMeAboutContextMenu);
       File.WriteAllText(file, contents);
     }
 
@@ -563,6 +600,11 @@
         MessageBox.Show("The action failed with exception. " + ex.Message + Environment.NewLine + Environment.NewLine + "Find details in log file");
         File.AppendAllText("ConfigBuilder.Tool.exe.log", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + " ERROR " + ex.GetType().FullName + Environment.NewLine + "Message: " + ex.Message + Environment.NewLine + "Stack trace:" + Environment.NewLine + ex.StackTrace + Environment.NewLine);
       }
+    }
+
+    private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+    {
+      SaveSettings(sender, e);
     }
   }
 }

@@ -125,7 +125,6 @@
       this.BuildShowConfig.TabIndex = 5;
       this.BuildShowConfig.Text = "Build showconfig.xml";
       this.BuildShowConfig.UseVisualStyleBackColor = true;
-      this.BuildShowConfig.CheckedChanged += new System.EventHandler(this.SaveSettings);
       // 
       // BuildWebConfigResult
       // 
@@ -136,7 +135,6 @@
       this.BuildWebConfigResult.TabIndex = 6;
       this.BuildWebConfigResult.Text = "Build web.config.result.xml";
       this.BuildWebConfigResult.UseVisualStyleBackColor = true;
-      this.BuildWebConfigResult.CheckedChanged += new System.EventHandler(this.SaveSettings);
       // 
       // NormalizeOutput
       // 
@@ -147,7 +145,6 @@
       this.NormalizeOutput.TabIndex = 7;
       this.NormalizeOutput.Text = "Normalize ouput file[s]";
       this.NormalizeOutput.UseVisualStyleBackColor = true;
-      this.NormalizeOutput.CheckedChanged += new System.EventHandler(this.SaveSettings);
       // 
       // SaveButton
       // 
@@ -218,7 +215,6 @@
       this.NoDestinationPrompt.TabIndex = 2;
       this.NoDestinationPrompt.Text = "Save files into the same folder";
       this.NoDestinationPrompt.UseVisualStyleBackColor = true;
-      this.NoDestinationPrompt.CheckedChanged += new System.EventHandler(this.SaveSettings);
       // 
       // CloseWhenDone
       // 
@@ -229,7 +225,6 @@
       this.CloseWhenDone.TabIndex = 4;
       this.CloseWhenDone.Text = "Close application after saving";
       this.CloseWhenDone.UseVisualStyleBackColor = true;
-      this.CloseWhenDone.CheckedChanged += new System.EventHandler(this.SaveSettings);
       // 
       // OpenFolder
       // 
@@ -240,7 +235,6 @@
       this.OpenFolder.TabIndex = 3;
       this.OpenFolder.Text = "Open folder after saving";
       this.OpenFolder.UseVisualStyleBackColor = true;
-      this.OpenFolder.CheckedChanged += new System.EventHandler(this.SaveSettings);
       // 
       // groupBox2
       // 
@@ -338,6 +332,7 @@
       this.MaximizeBox = false;
       this.Name = "MainForm";
       this.Text = "Sitecore ConfigBuilder {0}";
+      this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
       this.Load += new System.EventHandler(this.MainForm_Load);
       this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
       this.DragEnter += new System.Windows.Forms.DragEventHandler(this.MainForm_DragEnter);
