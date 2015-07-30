@@ -254,12 +254,13 @@
 
       var appPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sitecore.ConfigBuilder.Tool.exe");
 
+      RegistryKey keyConfigBuilder = null;
       try
       {
-        var key1 = classesRoot.OpenSubKey(@"*\shell\Sitecore.ConfigBuilder", RegistryKeyPermissionCheck.ReadSubTree);
-        if (key1 != null)
+        keyConfigBuilder = classesRoot.OpenSubKey(@"*\shell\Sitecore.ConfigBuilder", RegistryKeyPermissionCheck.ReadSubTree);
+        if (keyConfigBuilder != null)
         {
-          key1.Close();
+          keyConfigBuilder.Close();
           return;
         }
       }
@@ -268,51 +269,59 @@
         throw new System.Security.SecurityException(@"Don't have read access to the registry: hkcr\*\shell\Sitecore.ConfigBuilder");
       }
 
-      RegistryKey key = null;
+      var msg1 = "Click Yes if you would you like to embed a menu-item into Windows Explorer context menu for all \"web.config\" files in the system?";
+      var msg2 = "If you want to enable this feature click Yes and re-run the application with Administrator privilegies.";
+      var msg3 = "Click Cancel if you want to skip it for now or No if you don't want to see this message any longer.";
+      bool NoWriteRights = false;
+
       try
       {
         classesRoot.CreateSubKey(@"*\shell\");
       }
       catch (Exception)
       {
-        if (NeverAskMeAboutContextMenu)
-        {
-          return;
-        }
-        var msg = "Sitecore Config Builder can be embedded into Windows Explorer context menu as \"Open with Sitecore Config Builder\" for all \"web.config\" files in the system.\n" +
-          "If you want to enable this feature click Yes and re-run the application with Administrator privilegies.\n" +
-          "Click Cancel if you want to skip it for now or No if you don't want to see this message any longer.";
-        var result = MessageBox.Show(msg, "ConfigBuilder settings", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
-        if (result == System.Windows.Forms.DialogResult.Yes)
+        NoWriteRights = true;
+      }
+
+      if (NeverAskMeAboutContextMenu)
+      {
+        return;
+      }
+
+      var result = MessageBox.Show(
+        msg1 + Environment.NewLine + Environment.NewLine + (NoWriteRights ? (msg2 + Environment.NewLine + Environment.NewLine) : string.Empty) + msg3,
+        "ConfigBuilder settings",
+        MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+
+      if (result == System.Windows.Forms.DialogResult.Yes)
+      {
+        if (NoWriteRights)
         {
           Application.Exit();
+          return;
         }
-        else if (result == System.Windows.Forms.DialogResult.No)
+        else
+        {
+          var key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
+          if (key != null)
+          {
+            key.SetValue("", "Open with Sitecore ConfigBuilder");
+            key.SetValue("Icon", appPath);
+            key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
+            var command = key.CreateSubKey("command");
+            if (command != null)
+            {
+              command.SetValue("", "\"" + appPath + "\" \"%1\"");
+            }
+          }
+        }
+      }
+      else
+        if (result == System.Windows.Forms.DialogResult.No)
         {
           NeverAskMeAboutContextMenu = true;
         }
-        else if (result == System.Windows.Forms.DialogResult.Cancel)
-        {
-        }
-        return;
-      }
-      var msg1 = "Would you like to add an item into Windows Explorer context menu for all \"web.config\" files in the system?";
-      if (MessageBox.Show(msg1, "ConfigBuilder settings", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == System.Windows.Forms.DialogResult.Yes)
-      {
-        key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
-      }
 
-      if (key != null)
-      {
-        key.SetValue("", "Open with Sitecore ConfigBuilder");
-        key.SetValue("Icon", appPath);
-        key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
-        var command = key.CreateSubKey("command");
-        if (command != null)
-        {
-          command.SetValue("", appPath + " %1");
-        }
-      }
     }
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
@@ -401,7 +410,7 @@
         this.CloseWhenDone.Checked = boolParse(settings, 1);
         this.NormalizeOutput.Checked = boolParse(settings, 2);
         this.NoDestinationPrompt.Checked = boolParse(settings, 3);
-        this.BuildShowConfig.Checked = boolParse(settings, 4); 
+        this.BuildShowConfig.Checked = boolParse(settings, 4);
         this.BuildWebConfigResult.Checked = boolParse(settings, 5);
         this.RequireDefaultConfiguration.Checked = boolParse(settings, 6);
         this.NeverAskMeAboutContextMenu = boolParse(settings, 7);
@@ -514,13 +523,13 @@
       }
 
       var file = Path.Combine(AppDataFolderPath, "Settings.txt");
-      var contents = string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|", 
-        OpenFolder.Checked, 
-        CloseWhenDone.Checked, 
-        NormalizeOutput.Checked, 
-        NoDestinationPrompt.Checked, 
-        BuildShowConfig.Checked, 
-        BuildWebConfigResult.Checked, 
+      var contents = string.Format("{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|",
+        OpenFolder.Checked,
+        CloseWhenDone.Checked,
+        NormalizeOutput.Checked,
+        NoDestinationPrompt.Checked,
+        BuildShowConfig.Checked,
+        BuildWebConfigResult.Checked,
         RequireDefaultConfiguration.Checked,
         NeverAskMeAboutContextMenu);
       File.WriteAllText(file, contents);
