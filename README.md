@@ -4,7 +4,7 @@ This is an instrument to get all your Sitecore configuration files and output si
 
 ### Release Notes
 
-#### Sitecore ConfigBuilder 1.4 was released on XXXX XX, 2015
+#### Sitecore ConfigBuilder 1.4 was released on August 3, 2015
 
 * Added an option to download default configuration for comparison
 * A number of issues were fixed
@@ -41,4 +41,4 @@ The sources are open for inspection by everybody, please fork and improve if you
 ### Use its API
 
 This repository contains only UI part of the application, the engine is distributed in a separate repository:
-(https://github.com/Sitecore/Sitecore.Diagnostics.ConfigBuilder)[https://github.com/Sitecore/Sitecore.Diagnostics.ConfigBuilder]
+https://github.com/Sitecore/Sitecore.Diagnostics.ConfigBuilder
