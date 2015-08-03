@@ -2,6 +2,8 @@
 
 This is an instrument to get all your Sitecore configuration files and output single summarized configuration file that will be actually used by Sitecore CMS. It also can merge it with ASP.NET sections of web.config, and also sort all XML elements to make them easier to read and compare (soring is done only when it does not change sequence of handlers, pipeline processors etc.). 
 
+### [Download 1.4](https://github.com/Sitecore/Sitecore-Config-Builder/releases/download/1.4.0.9/SCB.1.4.0.9.zip)
+
 ### Release Notes
 
 #### Sitecore ConfigBuilder 1.4 was released on August 3, 2015
