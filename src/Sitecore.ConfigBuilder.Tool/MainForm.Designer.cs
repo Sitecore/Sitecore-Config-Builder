@@ -32,12 +32,9 @@
       this.StatusBar = new System.Windows.Forms.StatusStrip();
       this.ErrorLabel = new System.Windows.Forms.ToolStripStatusLabel();
       this.ActionsGroup = new System.Windows.Forms.GroupBox();
-      this.SitecoreVersionComboBox = new System.Windows.Forms.ComboBox();
-      this.RequireDefaultConfiguration = new System.Windows.Forms.CheckBox();
       this.BuildShowConfig = new System.Windows.Forms.CheckBox();
       this.BuildWebConfigResult = new System.Windows.Forms.CheckBox();
       this.NormalizeOutput = new System.Windows.Forms.CheckBox();
-      this.SaveButton = new System.Windows.Forms.Button();
       this.LabelDragNDrop = new System.Windows.Forms.Label();
       this.BrowseButton = new System.Windows.Forms.Button();
       this.FilePathTextbox = new System.Windows.Forms.TextBox();
@@ -54,19 +51,24 @@
       this.label3 = new System.Windows.Forms.Label();
       this.linkLabel1 = new System.Windows.Forms.LinkLabel();
       this.label2 = new System.Windows.Forms.Label();
+      this.groupBox5 = new System.Windows.Forms.GroupBox();
+      this.SitecoreVersionComboBox = new System.Windows.Forms.ComboBox();
+      this.RequireDefaultConfiguration = new System.Windows.Forms.CheckBox();
+      this.SaveButton = new System.Windows.Forms.Button();
       this.StatusBar.SuspendLayout();
       this.ActionsGroup.SuspendLayout();
       this.groupBox1.SuspendLayout();
       this.groupBox2.SuspendLayout();
       this.groupBox3.SuspendLayout();
       this.groupBox4.SuspendLayout();
+      this.groupBox5.SuspendLayout();
       this.SuspendLayout();
       // 
       // StatusBar
       // 
       this.StatusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ErrorLabel});
-      this.StatusBar.Location = new System.Drawing.Point(0, 379);
+      this.StatusBar.Location = new System.Drawing.Point(0, 375);
       this.StatusBar.Name = "StatusBar";
       this.StatusBar.Size = new System.Drawing.Size(503, 22);
       this.StatusBar.SizingGrip = false;
@@ -81,37 +83,15 @@
       // 
       // ActionsGroup
       // 
-      this.ActionsGroup.Controls.Add(this.SitecoreVersionComboBox);
-      this.ActionsGroup.Controls.Add(this.RequireDefaultConfiguration);
       this.ActionsGroup.Controls.Add(this.BuildShowConfig);
       this.ActionsGroup.Controls.Add(this.BuildWebConfigResult);
       this.ActionsGroup.Controls.Add(this.NormalizeOutput);
-      this.ActionsGroup.Controls.Add(this.SaveButton);
-      this.ActionsGroup.Location = new System.Drawing.Point(201, 172);
+      this.ActionsGroup.Location = new System.Drawing.Point(255, 172);
       this.ActionsGroup.Name = "ActionsGroup";
-      this.ActionsGroup.Size = new System.Drawing.Size(285, 145);
+      this.ActionsGroup.Size = new System.Drawing.Size(231, 94);
       this.ActionsGroup.TabIndex = 16;
       this.ActionsGroup.TabStop = false;
       this.ActionsGroup.Text = "STEP 4 – Actions";
-      // 
-      // SitecoreVersionComboBox
-      // 
-      this.SitecoreVersionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-      this.SitecoreVersionComboBox.FormattingEnabled = true;
-      this.SitecoreVersionComboBox.Location = new System.Drawing.Point(10, 114);
-      this.SitecoreVersionComboBox.Name = "SitecoreVersionComboBox";
-      this.SitecoreVersionComboBox.Size = new System.Drawing.Size(186, 21);
-      this.SitecoreVersionComboBox.TabIndex = 9;
-      // 
-      // RequireDefaultConfiguration
-      // 
-      this.RequireDefaultConfiguration.AutoSize = true;
-      this.RequireDefaultConfiguration.Location = new System.Drawing.Point(10, 91);
-      this.RequireDefaultConfiguration.Name = "RequireDefaultConfiguration";
-      this.RequireDefaultConfiguration.Size = new System.Drawing.Size(215, 17);
-      this.RequireDefaultConfiguration.TabIndex = 8;
-      this.RequireDefaultConfiguration.Text = "Download default Sitecore configuration";
-      this.RequireDefaultConfiguration.UseVisualStyleBackColor = true;
       // 
       // BuildShowConfig
       // 
@@ -145,17 +125,6 @@
       this.NormalizeOutput.TabIndex = 7;
       this.NormalizeOutput.Text = "Normalize ouput file[s]";
       this.NormalizeOutput.UseVisualStyleBackColor = true;
-      // 
-      // SaveButton
-      // 
-      this.SaveButton.Enabled = false;
-      this.SaveButton.Location = new System.Drawing.Point(204, 112);
-      this.SaveButton.Name = "SaveButton";
-      this.SaveButton.Size = new System.Drawing.Size(75, 23);
-      this.SaveButton.TabIndex = 10;
-      this.SaveButton.Text = "Save";
-      this.SaveButton.UseVisualStyleBackColor = true;
-      this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
       // 
       // LabelDragNDrop
       // 
@@ -201,7 +170,7 @@
       this.groupBox1.Controls.Add(this.OpenFolder);
       this.groupBox1.Location = new System.Drawing.Point(12, 172);
       this.groupBox1.Name = "groupBox1";
-      this.groupBox1.Size = new System.Drawing.Size(183, 145);
+      this.groupBox1.Size = new System.Drawing.Size(231, 94);
       this.groupBox1.TabIndex = 14;
       this.groupBox1.TabStop = false;
       this.groupBox1.Text = "STEP 3 – Advanced Options";
@@ -281,9 +250,9 @@
       this.groupBox4.Controls.Add(this.label3);
       this.groupBox4.Controls.Add(this.linkLabel1);
       this.groupBox4.Controls.Add(this.label2);
-      this.groupBox4.Location = new System.Drawing.Point(12, 323);
+      this.groupBox4.Location = new System.Drawing.Point(12, 324);
       this.groupBox4.Name = "groupBox4";
-      this.groupBox4.Size = new System.Drawing.Size(474, 39);
+      this.groupBox4.Size = new System.Drawing.Size(275, 39);
       this.groupBox4.TabIndex = 32;
       this.groupBox4.TabStop = false;
       this.groupBox4.Text = "EXTRA – Normalize showconfig.xml file";
@@ -292,7 +261,7 @@
       // 
       this.label3.Location = new System.Drawing.Point(249, 16);
       this.label3.Name = "label3";
-      this.label3.Size = new System.Drawing.Size(198, 18);
+      this.label3.Size = new System.Drawing.Size(20, 18);
       this.label3.TabIndex = 33;
       this.label3.Text = "it.";
       // 
@@ -315,13 +284,56 @@
       this.label2.TabIndex = 31;
       this.label2.Text = "If showconfig.xml already exists, you can";
       // 
+      // groupBox5
+      // 
+      this.groupBox5.Controls.Add(this.SitecoreVersionComboBox);
+      this.groupBox5.Controls.Add(this.RequireDefaultConfiguration);
+      this.groupBox5.Location = new System.Drawing.Point(12, 272);
+      this.groupBox5.Name = "groupBox5";
+      this.groupBox5.Size = new System.Drawing.Size(474, 46);
+      this.groupBox5.TabIndex = 33;
+      this.groupBox5.TabStop = false;
+      this.groupBox5.Text = "STEP 5 - Compare with defaults";
+      // 
+      // SitecoreVersionComboBox
+      // 
+      this.SitecoreVersionComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+      this.SitecoreVersionComboBox.FormattingEnabled = true;
+      this.SitecoreVersionComboBox.Location = new System.Drawing.Point(253, 15);
+      this.SitecoreVersionComboBox.Name = "SitecoreVersionComboBox";
+      this.SitecoreVersionComboBox.Size = new System.Drawing.Size(132, 21);
+      this.SitecoreVersionComboBox.TabIndex = 12;
+      // 
+      // RequireDefaultConfiguration
+      // 
+      this.RequireDefaultConfiguration.AutoSize = true;
+      this.RequireDefaultConfiguration.Location = new System.Drawing.Point(10, 19);
+      this.RequireDefaultConfiguration.Name = "RequireDefaultConfiguration";
+      this.RequireDefaultConfiguration.Size = new System.Drawing.Size(239, 17);
+      this.RequireDefaultConfiguration.TabIndex = 11;
+      this.RequireDefaultConfiguration.Text = "Download a default Sitecore configuration for";
+      this.RequireDefaultConfiguration.UseVisualStyleBackColor = true;
+      // 
+      // SaveButton
+      // 
+      this.SaveButton.Enabled = false;
+      this.SaveButton.Location = new System.Drawing.Point(405, 335);
+      this.SaveButton.Name = "SaveButton";
+      this.SaveButton.Size = new System.Drawing.Size(75, 23);
+      this.SaveButton.TabIndex = 13;
+      this.SaveButton.Text = "Save";
+      this.SaveButton.UseVisualStyleBackColor = true;
+      this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
+      // 
       // MainForm
       // 
       this.AllowDrop = true;
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-      this.ClientSize = new System.Drawing.Size(503, 401);
+      this.ClientSize = new System.Drawing.Size(503, 397);
+      this.Controls.Add(this.groupBox5);
       this.Controls.Add(this.groupBox4);
+      this.Controls.Add(this.SaveButton);
       this.Controls.Add(this.groupBox3);
       this.Controls.Add(this.groupBox2);
       this.Controls.Add(this.ActionsGroup);
@@ -331,7 +343,7 @@
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MaximizeBox = false;
       this.Name = "MainForm";
-      this.Text = "Sitecore ConfigBuilder {0}";
+      this.Text = "Sitecore Config Builder {0}";
       this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
       this.Load += new System.EventHandler(this.MainForm_Load);
       this.DragDrop += new System.Windows.Forms.DragEventHandler(this.MainForm_DragDrop);
@@ -347,6 +359,8 @@
       this.groupBox3.PerformLayout();
       this.groupBox4.ResumeLayout(false);
       this.groupBox4.PerformLayout();
+      this.groupBox5.ResumeLayout(false);
+      this.groupBox5.PerformLayout();
       this.ResumeLayout(false);
       this.PerformLayout();
 
@@ -371,14 +385,15 @@
     private System.Windows.Forms.GroupBox groupBox2;
     private System.Windows.Forms.GroupBox groupBox3;
     private System.Windows.Forms.Label LabelDescription;
-    private System.Windows.Forms.Button SaveButton;
     private System.Windows.Forms.Label label1;
     private System.Windows.Forms.GroupBox groupBox4;
-    private System.Windows.Forms.Label label3;
     private System.Windows.Forms.LinkLabel linkLabel1;
     private System.Windows.Forms.Label label2;
+    private System.Windows.Forms.Label label3;
+    private System.Windows.Forms.GroupBox groupBox5;
     private System.Windows.Forms.ComboBox SitecoreVersionComboBox;
     private System.Windows.Forms.CheckBox RequireDefaultConfiguration;
+    private System.Windows.Forms.Button SaveButton;
   }
 }
 
