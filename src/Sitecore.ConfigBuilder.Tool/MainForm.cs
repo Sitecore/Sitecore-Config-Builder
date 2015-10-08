@@ -93,24 +93,13 @@
           {
             try
             {
-              var tempFolder = SitecoreVersions.DownloadDefaultConfigurationFiles(version);
-              try
+              var versionInfos = new ServiceClient().GetVersions("Sitecore CMS");
+              var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
+              var releaseInfo = versionInfo.Releases.First(x => version.EndsWith(x.Revision));
+              releaseInfo.Defaults.Configs.ShowConfigNormalized.Save(outputShowConfigFile + "." + version + ".xml");
+              if (buildWebConfigResult)
               {
-                if (tempFolder.Exists)
-                {
-                  Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputShowConfigFile + "." + version + ".xml", buildWebConfigResult, normalizeOutput);
-                  if (buildWebConfigResult)
-                  {
-                    Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(Path.Combine(tempFolder.FullName, "web.config"), outputWebConfigFile + "." + version + ".xml", buildWebConfigResult, normalizeOutput);
-                  }
-                }
-              }
-              finally
-              {
-                if (tempFolder.Exists)
-                {
-                  tempFolder.Delete();
-                }
+                releaseInfo.Defaults.Configs.ConfigurationNormalized.Save(outputWebConfigFile + "." + version + ".xml");
               }
             }
             catch (Exception ex)
@@ -234,7 +223,7 @@
         this.ReadSettings();
         UpdateMenuContextButton();
         //new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
-        new ToDoHandler(SitecoreVersions.GetVersions).BeginInvoke(PopulateVersionsComboBox, null);
+        new ToDoHandler(() => new ServiceClient().GetReleaseNames("Sitecore CMS")).BeginInvoke(PopulateVersionsComboBox, null);
         this.Text = string.Format(this.Text ?? string.Empty, GetVersion());
       }
       catch (Exception ex)
@@ -332,7 +321,7 @@
       {
         if (result != null)
         {
-          object[] items = result.Cast<object>().ToArray<object>();
+          object[] items = result.ToArray<object>();
           this.SitecoreVersionComboBox.Items.AddRange(items);
           if (this.SitecoreVersionComboBox.Items.Count > 0)
           {

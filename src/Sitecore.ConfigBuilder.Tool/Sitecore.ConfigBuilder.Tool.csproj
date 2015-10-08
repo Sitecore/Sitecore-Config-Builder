@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sitecore.ConfigBuilder.Tool</RootNamespace>
     <AssemblyName>Sitecore.ConfigBuilder.Tool</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -61,15 +61,21 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="Sitecore.Diagnostics.Base">
       <HintPath>..\packages\Sitecore.Diagnostics.Base.1.0.0.14\lib\net35\Sitecore.Diagnostics.Base.dll</HintPath>
     </Reference>
     <Reference Include="Sitecore.Diagnostics.ConfigBuilder">
       <HintPath>..\packages\Sitecore.Diagnostics.ConfigBuilder.1.0.0.11\lib\net35\Sitecore.Diagnostics.ConfigBuilder.dll</HintPath>
     </Reference>
-    <Reference Include="Sitecore.Diagnsotics.InformationService.Client, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Sitecore.Diagnostics.Database">
+      <HintPath>..\packages\Sitecore.Diagnostics.Database.1.0.0.3\lib\net40\Sitecore.Diagnostics.Database.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Diagnsotics.InformationService.Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f9a5856b52eceddf, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Sitecore.Diagnsotics.InformationService.Client.1.0.0.42\lib\net35\Sitecore.Diagnsotics.InformationService.Client.dll</HintPath>
+      <HintPath>..\packages\Sitecore.Diagnsotics.InformationService.Client.1.0.0.130\lib\net40\Sitecore.Diagnsotics.InformationService.Client.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
