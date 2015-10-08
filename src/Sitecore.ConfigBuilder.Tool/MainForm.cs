@@ -294,7 +294,7 @@
           var key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
           if (key != null)
           {
-            key.SetValue("", "Open with Sitecore ConfigBuilder");
+            key.SetValue("", "Open with Sitecore Config Builder");
             key.SetValue("Icon", appPath);
             key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
             var command = key.CreateSubKey("command");
