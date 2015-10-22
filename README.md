@@ -12,6 +12,10 @@ This is an instrument to get all your Sitecore configuration files and output si
 * A number of issues were fixed
 * Source code is now available for both Engine and UI
 
+##### Known Issue
+
+The app may crash if current user doesn't have write access to %PROGRAM DATA%\Sitecore folder. 
+
 #### Sitecore ConfigBuilder 1.3 was released on June 30, 2014
 
 * Added showconfig.xml normalization feature (it was possible only via API)
