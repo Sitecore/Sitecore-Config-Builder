@@ -2,31 +2,13 @@
 
 This is an instrument to get all your Sitecore configuration files and output single summarized configuration file that will be actually used by Sitecore CMS. It also can merge it with ASP.NET sections of web.config, and also sort all XML elements to make them easier to read and compare (soring is done only when it does not change sequence of handlers, pipeline processors etc.). 
 
-### [Download 1.4](https://github.com/Sitecore/Sitecore-Config-Builder/releases/download/1.4.0.9/SCB.1.4.0.9.zip)
+New feature of 1.4 is downloading default configuration for the specific Sitecore version for comparison with the actual.
+
+### [Download 1.4.0.15](https://github.com/Sitecore/Sitecore-Config-Builder/releases/download/1.4.0.15/SCB.1.4.0.15.zip)
 
 ### Release Notes
 
-#### Sitecore ConfigBuilder 1.4 was released on August 3, 2015
-
-* Added an option to download default configuration for comparison
-* A number of issues were fixed
-* Source code is now available for both Engine and UI
-
-##### Known Issue
-
-The app may crash if current user doesn't have write access to %PROGRAM DATA%\Sitecore folder. 
-
-#### Sitecore ConfigBuilder 1.3 was released on June 30, 2014
-
-* Added showconfig.xml normalization feature (it was possible only via API)
-* A number of issues were fixed
-* API was improved, interface and implementation was extracted from static method; all private methods became protected virtual
-
-#### Sitecore ConfigBuilder 1.2 was released on January 16, 2014
-
-It no longer requires actual Sitecore.Kernel.dll assembly file, now Sitecore CMS 7.0 configuration engine is embedded into the tool and API.
-
-The API was completely simplified and requires only 1 assembly to reference. 
+Find all 1.4+ releases on the [GitHub Releases](https://github.com/Sitecore/Sitecore-Config-Builder/releases) page.
 
 ### Details
 
@@ -38,7 +20,7 @@ The API was completely simplified and requires only 1 assembly to reference.
 
 ### Download
 
-The project is always available to download from [Marketplace](http://marketplace.sitecore.net/modules/sitecore_configbuilder.aspx). 
+The project is always available to download from [Marketplace](http://marketplace.sitecore.net/modules/sitecore_configbuilder.aspx), however the most recent version is available only here.
 
 ### Open Source
 
