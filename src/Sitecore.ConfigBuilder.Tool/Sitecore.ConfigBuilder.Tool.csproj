@@ -57,25 +57,20 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Ionic.Zip.Reduced, Version=1.9.1.8, Culture=neutral, PublicKeyToken=edbe51ad942a3f5c, processorArchitecture=MSIL">
+    <Reference Include="Sitecore.Diagnostics.Base, Version=1.0.0.0, Culture=neutral, PublicKeyToken=2a430da507ea8b02, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\DotNetZip.Reduced.1.9.1.8\lib\net20\Ionic.Zip.Reduced.dll</HintPath>
+      <HintPath>..\packages\Sitecore.Diagnostics.Base.1.0.0.24\lib\net35\Sitecore.Diagnostics.Base.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="Sitecore.Diagnostics.Base">
-      <HintPath>..\packages\Sitecore.Diagnostics.Base.1.0.0.14\lib\net35\Sitecore.Diagnostics.Base.dll</HintPath>
-    </Reference>
-    <Reference Include="Sitecore.Diagnostics.ConfigBuilder">
-      <HintPath>..\packages\Sitecore.Diagnostics.ConfigBuilder.1.0.0.11\lib\net35\Sitecore.Diagnostics.ConfigBuilder.dll</HintPath>
-    </Reference>
-    <Reference Include="Sitecore.Diagnostics.Database">
-      <HintPath>..\packages\Sitecore.Diagnostics.Database.1.0.0.3\lib\net40\Sitecore.Diagnostics.Database.dll</HintPath>
-    </Reference>
-    <Reference Include="Sitecore.Diagnsotics.InformationService.Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f9a5856b52eceddf, processorArchitecture=MSIL">
+    <Reference Include="Sitecore.Diagnostics.ConfigBuilder, Version=1.0.0.0, Culture=neutral, PublicKeyToken=835b316ca91bcd48, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Sitecore.Diagnsotics.InformationService.Client.1.0.0.130\lib\net40\Sitecore.Diagnsotics.InformationService.Client.dll</HintPath>
+      <HintPath>..\packages\Sitecore.Diagnostics.ConfigBuilder.1.0.0.16\lib\net35\Sitecore.Diagnostics.ConfigBuilder.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Diagnostics.Database, Version=1.0.0.0, Culture=neutral, PublicKeyToken=1eb7b03b14a31fae, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Sitecore.Diagnostics.Database.1.0.0.8\lib\net40\Sitecore.Diagnostics.Database.dll</HintPath>
+    </Reference>
+    <Reference Include="Sitecore.Diagnostics.InformationService.Client">
+      <HintPath>..\packages\Sitecore.Diagnostics.InformationService.Client.1.3.0.0\lib\net40\Sitecore.Diagnostics.InformationService.Client.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

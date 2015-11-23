@@ -1,19 +1,19 @@
 ﻿namespace Sitecore.ConfigBuilder.Tool
 {
   using System;
+  using System.Collections.Generic;
   using System.Diagnostics;
   using System.IO;
   using System.Linq;
   using System.Reflection;
+  using System.Runtime.Remoting.Messaging;
   using System.Windows.Forms;
   using System.Xml.Linq;
-  using Sitecore.Diagnostics;
-  using Sitecore.Diagnostics.Annotations;
-  using Sitecore.Diagnostics.ConfigBuilder;
-  using Sitecore.Diagnsotics.InformationService.Client;
-  using System.Collections.Generic;
-  using System.Runtime.Remoting.Messaging;
   using Microsoft.Win32;
+  using Sitecore.Diagnostics.Base;
+  using Sitecore.Diagnostics.Base.Annotations;
+  using Sitecore.Diagnostics.ConfigBuilder;
+  using Sitecore.Diagnostics.InformationService.Client;
 
   internal partial class MainForm : Form
   {
