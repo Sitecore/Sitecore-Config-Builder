@@ -492,7 +492,7 @@
         var major = doc.Descendants("major").FirstOrDefault().Value;
         var minor = doc.Descendants("minor").FirstOrDefault().Value;
         var build = doc.Descendants("build").FirstOrDefault().Value;
-        var revision = doc.Descendants("revision").FirstOrDefault().Value;
+        var revision = doc.Descendants("revision").FirstOrDefault().Value.Substring(0, 6);
         var version = major + "." + minor + (string.IsNullOrEmpty(build) ? "" : ("." + build)) + " rev. " + revision;
 
         return version;
