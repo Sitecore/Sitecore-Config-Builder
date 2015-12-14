@@ -301,7 +301,7 @@
       this.SitecoreVersionComboBox.FormattingEnabled = true;
       this.SitecoreVersionComboBox.Location = new System.Drawing.Point(253, 15);
       this.SitecoreVersionComboBox.Name = "SitecoreVersionComboBox";
-      this.SitecoreVersionComboBox.Size = new System.Drawing.Size(132, 21);
+      this.SitecoreVersionComboBox.Size = new System.Drawing.Size(215, 21);
       this.SitecoreVersionComboBox.TabIndex = 12;
       // 
       // RequireDefaultConfiguration

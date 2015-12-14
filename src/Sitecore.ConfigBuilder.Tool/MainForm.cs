@@ -223,7 +223,13 @@
         this.ReadSettings();
         UpdateMenuContextButton();
         //new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
-        new ToDoHandler(() => new ServiceClient().GetReleaseNames("Sitecore CMS")).BeginInvoke(PopulateVersionsComboBox, null);
+        new ToDoHandler(() =>
+        {
+          var vList = new List<Diagnostics.InformationService.Client.Model.IRelease>();
+          foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
+            vList.AddRange(vv.Releases.ToArray());
+          return vList.Select(vv => string.Format("{0} ({1})", vv.Name, vv.Label)).ToArray();
+        }).BeginInvoke(PopulateVersionsComboBox, null);
         this.Text = string.Format(this.Text ?? string.Empty, GetVersion());
       }
       catch (Exception ex)
@@ -444,7 +450,7 @@
       {
         foreach (var item in this.SitecoreVersionComboBox.Items)
         {
-          if (item == null || item.ToString() != version)
+          if (item == null || !item.ToString().StartsWith(version))
           {
             continue;
           }
