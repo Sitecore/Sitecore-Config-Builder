@@ -95,7 +95,8 @@
             {
               var versionInfos = new ServiceClient().GetVersions("Sitecore CMS");
               var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
-              var releaseInfo = versionInfo.Releases.First(x => version.EndsWith(x.Revision));
+              var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Name));
+              
               releaseInfo.Defaults.Configs.ShowConfigNormalized.Save(outputShowConfigFile + "." + version + ".xml");
               if (buildWebConfigResult)
               {
