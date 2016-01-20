@@ -56,9 +56,7 @@
     {
       try
       {
-        var webConfigPath = this.FilePathTextbox.Text;
-        Assert.IsNotNull(webConfigPath, "webConfigPath");
-
+        var webConfigPath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
         var buildWebConfigResult = this.BuildWebConfigResult.Checked;
         var normalizeOutput = this.NormalizeOutput.Checked;
         var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
@@ -78,10 +76,7 @@
           Assert.IsNotNull(outputWebConfigFile, "outputWebConfigFile");
         }
 
-        // GoTo Gunun national park, because in the issue-tracker and the goal-list there wasn't a progress bar in a box for downloading process!
-        /****************************************************/
-
-        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputShowConfigFile, buildWebConfigResult, normalizeOutput);
+        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputShowConfigFile, false, normalizeOutput);
         if (buildWebConfigResult)
         {
           Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputWebConfigFile, buildWebConfigResult, normalizeOutput);
@@ -95,7 +90,8 @@
             {
               var versionInfos = new ServiceClient().GetVersions("Sitecore CMS");
               var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
-              var releaseInfo = versionInfo.Releases.First(x => version.EndsWith(x.Revision));
+              var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Name));
+
               releaseInfo.Defaults.Configs.ShowConfigNormalized.Save(outputShowConfigFile + "." + version + ".xml");
               if (buildWebConfigResult)
               {
@@ -108,7 +104,6 @@
             }
           }
         }
-        /****************************************************/
 
         if (this.OpenFolder.Checked && File.Exists(outputWebConfigFile))
         {
@@ -137,10 +132,10 @@
       if (!this.NoDestinationPrompt.Checked)
       {
         var fileDialog = new SaveFileDialog
-      {
-        FileName = fileName,
-        Filter = SaveFilter
-      };
+        {
+          FileName = fileName,
+          Filter = SaveFilter
+        };
 
         if (fileDialog.ShowDialog(this) != DialogResult.OK)
         {
@@ -153,7 +148,7 @@
         return result;
       }
 
-      var directoryName = Path.GetDirectoryName(webConfigFilePath ?? this.FilePathTextbox.Text);
+      var directoryName = Path.GetDirectoryName(webConfigFilePath ?? this.FilePathTextbox.Text.Trim(" \"".ToCharArray()));
       Assert.IsNotNull(directoryName, "directoryName");
 
       return Path.Combine(directoryName, fileName);
@@ -311,12 +306,10 @@
           }
         }
       }
-      else
-        if (result == System.Windows.Forms.DialogResult.No)
-        {
-          NeverAskMeAboutContextMenu = true;
-        }
-
+      else if (result == System.Windows.Forms.DialogResult.No)
+      {
+        NeverAskMeAboutContextMenu = true;
+      }
     }
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
@@ -332,7 +325,7 @@
           if (this.SitecoreVersionComboBox.Items.Count > 0)
           {
             this.SitecoreVersionComboBox.SelectedIndex = 0;
-            if (this.FilePathTextbox.Text.Trim().Length > 0)
+            if (this.FilePathTextbox.Text.Trim(" \"".ToCharArray()).Length > 0)
             {
               UpdateSaveButton();
             }
@@ -341,7 +334,7 @@
       };
       if (this.SitecoreVersionComboBox.InvokeRequired)
       {
-        base.Invoke(method);
+        this.Invoke(method);
       }
       else
       {
@@ -388,16 +381,16 @@
       try
       {
         var boolParse = new Func<string[], int, bool>((p0, p1) =>
+        {
+          try
           {
-            try
-            {
-              return bool.Parse(p0[p1]);
-            }
-            catch (Exception)
-            {
-              return false;
-            }
-          });
+            return bool.Parse(p0[p1]);
+          }
+          catch (Exception)
+          {
+            return false;
+          }
+        });
 
         var settings = File.ReadAllText(SettingsFilePath).Split('|');
 
@@ -421,7 +414,7 @@
 
     private void UpdateSaveButton()
     {
-      var webConfigFilePath = this.FilePathTextbox.Text.Trim();
+      var webConfigFilePath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
       if (string.IsNullOrEmpty(webConfigFilePath))
       {
         this.SaveButton.Enabled = false;

@@ -4,11 +4,7 @@ This is an instrument to get all your Sitecore configuration files and output si
 
 New feature of 1.4 is downloading default configuration for the specific Sitecore version for comparison with the actual.
 
-### [Download 1.4.0.15](https://github.com/Sitecore/Sitecore-Config-Builder/releases/download/1.4.0.15/SCB.1.4.0.15.zip)
-
-### Release Notes
-
-Find all 1.4+ releases on the [GitHub Releases](https://github.com/Sitecore/Sitecore-Config-Builder/releases) page.
+### [Downloads](https://github.com/Sitecore/Sitecore-Config-Builder/releases)
 
 ### Details
 
@@ -17,10 +13,6 @@ Find all 1.4+ releases on the [GitHub Releases](https://github.com/Sitecore/Site
 * The `web.config.result.xml` file is made by merging web.config and showconfig.xml files.
 * It can do normalization of both files (reordering configuration sections when it doesn't change execution logic)
 * The normalized versions of `web.config.result.xml` files are perfect for comparing 
-
-### Download
-
-The project is always available to download from [Marketplace](http://marketplace.sitecore.net/modules/sitecore_configbuilder.aspx), however the most recent version is available only here.
 
 ### Open Source
 
