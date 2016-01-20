@@ -76,7 +76,7 @@
           Assert.IsNotNull(outputWebConfigFile, "outputWebConfigFile");
         }
 
-        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputShowConfigFile, buildWebConfigResult, normalizeOutput);
+        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputShowConfigFile, false, normalizeOutput);
         if (buildWebConfigResult)
         {
           Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputWebConfigFile, buildWebConfigResult, normalizeOutput);
