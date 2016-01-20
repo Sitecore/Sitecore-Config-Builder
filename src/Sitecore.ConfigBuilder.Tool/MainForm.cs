@@ -76,9 +76,6 @@
           Assert.IsNotNull(outputWebConfigFile, "outputWebConfigFile");
         }
 
-        // GoTo Gunun national park, because in the issue-tracker and the goal-list there wasn't a progress bar in a box for downloading process!
-        /****************************************************/
-
         Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputShowConfigFile, buildWebConfigResult, normalizeOutput);
         if (buildWebConfigResult)
         {
@@ -107,7 +104,6 @@
             }
           }
         }
-        /****************************************************/
 
         if (this.OpenFolder.Checked && File.Exists(outputWebConfigFile))
         {
@@ -136,10 +132,10 @@
       if (!this.NoDestinationPrompt.Checked)
       {
         var fileDialog = new SaveFileDialog
-      {
-        FileName = fileName,
-        Filter = SaveFilter
-      };
+        {
+          FileName = fileName,
+          Filter = SaveFilter
+        };
 
         if (fileDialog.ShowDialog(this) != DialogResult.OK)
         {
@@ -387,16 +383,16 @@
       try
       {
         var boolParse = new Func<string[], int, bool>((p0, p1) =>
+        {
+          try
           {
-            try
-            {
-              return bool.Parse(p0[p1]);
-            }
-            catch (Exception)
-            {
-              return false;
-            }
-          });
+            return bool.Parse(p0[p1]);
+          }
+          catch (Exception)
+          {
+            return false;
+          }
+        });
 
         var settings = File.ReadAllText(SettingsFilePath).Split('|');
 
