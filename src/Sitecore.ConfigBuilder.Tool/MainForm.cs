@@ -56,9 +56,7 @@
     {
       try
       {
-        var webConfigPath = this.FilePathTextbox.Text;
-        Assert.IsNotNull(webConfigPath, "webConfigPath");
-
+        var webConfigPath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
         var buildWebConfigResult = this.BuildWebConfigResult.Checked;
         var normalizeOutput = this.NormalizeOutput.Checked;
         var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
@@ -154,7 +152,7 @@
         return result;
       }
 
-      var directoryName = Path.GetDirectoryName(webConfigFilePath ?? this.FilePathTextbox.Text);
+      var directoryName = Path.GetDirectoryName(webConfigFilePath ?? this.FilePathTextbox.Text.Trim(" \"".ToCharArray()));
       Assert.IsNotNull(directoryName, "directoryName");
 
       return Path.Combine(directoryName, fileName);
@@ -333,7 +331,7 @@
           if (this.SitecoreVersionComboBox.Items.Count > 0)
           {
             this.SitecoreVersionComboBox.SelectedIndex = 0;
-            if (this.FilePathTextbox.Text.Trim().Length > 0)
+            if (this.FilePathTextbox.Text.Trim(" \"".ToCharArray()).Length > 0)
             {
               UpdateSaveButton();
             }
@@ -422,7 +420,7 @@
 
     private void UpdateSaveButton()
     {
-      var webConfigFilePath = this.FilePathTextbox.Text.Trim();
+      var webConfigFilePath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
       if (string.IsNullOrEmpty(webConfigFilePath))
       {
         this.SaveButton.Enabled = false;
