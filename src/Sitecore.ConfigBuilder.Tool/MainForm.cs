@@ -91,7 +91,7 @@
               var versionInfos = new ServiceClient().GetVersions("Sitecore CMS");
               var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
               var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Name));
-              
+
               releaseInfo.Defaults.Configs.ShowConfigNormalized.Save(outputShowConfigFile + "." + version + ".xml");
               if (buildWebConfigResult)
               {
@@ -306,12 +306,10 @@
           }
         }
       }
-      else
-        if (result == System.Windows.Forms.DialogResult.No)
-        {
-          NeverAskMeAboutContextMenu = true;
-        }
-
+      else if (result == System.Windows.Forms.DialogResult.No)
+      {
+        NeverAskMeAboutContextMenu = true;
+      }
     }
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
@@ -336,7 +334,7 @@
       };
       if (this.SitecoreVersionComboBox.InvokeRequired)
       {
-        base.Invoke(method);
+        this.Invoke(method);
       }
       else
       {
