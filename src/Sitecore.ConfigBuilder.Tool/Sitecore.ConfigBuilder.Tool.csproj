@@ -104,8 +104,6 @@
     </None>
     <None Include="app.manifest" />
     <None Include="packages.config" />
-    <None Include="WindowsContextMenuHandlers\AddSCBItemToContextMenu.bat" />
-    <None Include="WindowsContextMenuHandlers\DeleteSCBItemFromContextMenu.bat" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
