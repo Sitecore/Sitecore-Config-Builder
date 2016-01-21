@@ -92,10 +92,14 @@
               var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
               var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Name));
 
-              releaseInfo.Defaults.Configs.ShowConfigNormalized.Save(outputShowConfigFile + "." + version + ".xml");
+              var defaultShowConfig = outputShowConfigFile + "." + version + ".xml";
+              releaseInfo.Defaults.Configs.ShowConfig.Save(defaultShowConfig);
+              Normalizer.Normalize(defaultShowConfig, defaultShowConfig + ".normalized.xml");
               if (buildWebConfigResult)
               {
-                releaseInfo.Defaults.Configs.ConfigurationNormalized.Save(outputWebConfigFile + "." + version + ".xml");
+                var defaultWebConfigResult = outputWebConfigFile + "." + version + ".xml";
+                releaseInfo.Defaults.Configs.Configuration.Save(defaultWebConfigResult);
+                Normalizer.Normalize(defaultWebConfigResult, defaultWebConfigResult + ".normalized.xml");
               }
             }
             catch (Exception ex)
