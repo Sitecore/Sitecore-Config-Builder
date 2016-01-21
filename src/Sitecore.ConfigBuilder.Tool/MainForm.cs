@@ -76,10 +76,19 @@
           Assert.IsNotNull(outputWebConfigFile, "outputWebConfigFile");
         }
 
-        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputShowConfigFile, false, normalizeOutput);
+        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, false).Save(outputShowConfigFile);
+        if (normalizeOutput)
+        {
+          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
+        }
+
         if (buildWebConfigResult)
         {
-          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, outputWebConfigFile, buildWebConfigResult, normalizeOutput);
+          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, false).Save(outputWebConfigFile);
+          if (normalizeOutput)
+          {
+            Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile));
+          }
         }
 
         if (requireDefaultConfiguration)
@@ -92,10 +101,14 @@
               var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
               var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Name));
 
-              releaseInfo.Defaults.Configs.ShowConfigNormalized.Save(outputShowConfigFile + "." + version + ".xml");
+              var defaultShowConfig = outputShowConfigFile + "." + version + ".xml";
+              releaseInfo.Defaults.Configs.ShowConfig.Save(defaultShowConfig);
+              Normalizer.Normalize(defaultShowConfig, GetNormalizedPath(defaultShowConfig));
               if (buildWebConfigResult)
               {
-                releaseInfo.Defaults.Configs.ConfigurationNormalized.Save(outputWebConfigFile + "." + version + ".xml");
+                var defaultWebConfigResult = outputWebConfigFile + "." + version + ".xml";
+                releaseInfo.Defaults.Configs.Configuration.Save(defaultWebConfigResult);
+                Normalizer.Normalize(defaultWebConfigResult, GetNormalizedPath(defaultWebConfigResult));
               }
             }
             catch (Exception ex)
@@ -121,6 +134,11 @@
         MessageBox.Show("The action failed with exception. " + ex.Message + Environment.NewLine + "Find details in the ConfigBuilder.ConfigBuilder.dll.log file", "Sitecore ConfigBuilder");
         File.AppendAllText("ConfigBuilder.ConfigBuilder.dll.log", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + " ERROR " + ex.GetType().FullName + Environment.NewLine + "Message: " + ex.Message + Environment.NewLine + "Stack trace:" + Environment.NewLine + ex.StackTrace + Environment.NewLine);
       }
+    }
+
+    private static string GetNormalizedPath(string defaultWebConfigResult)
+    {
+      return Path.Combine(Path.GetDirectoryName(defaultWebConfigResult), "norm." + Path.GetFileName(defaultWebConfigResult));
     }
 
 
@@ -579,7 +597,7 @@
           return;
         }
 
-        Normalizer.Normalize(showconfigPath, showconfigPath + ".normalized.xml");
+        Normalizer.Normalize(showconfigPath, GetNormalizedPath(showconfigPath));
 
         if (this.OpenFolder.Checked && File.Exists(outputFile))
         {
