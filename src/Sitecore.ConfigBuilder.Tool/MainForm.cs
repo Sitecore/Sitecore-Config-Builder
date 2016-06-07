@@ -255,6 +255,7 @@
     private void UpdateMenuContextButton()
     {
       //Readme: https://paulkravchenko.wordpress.com/2010/11/03/add-cascading-menus-for-your-favorite-programs-in-windows-7-desktop-context-menu/
+      //readme: http://www.cyberforum.ru/windows/thread617978.html
 
       var classesRoot = Registry.ClassesRoot;
       if (classesRoot == null)
