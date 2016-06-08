@@ -328,6 +328,18 @@
               command.SetValue("", "\"" + appPath + "\" \"%1\"");
             }
           }
+          var cOff = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigDisable");
+          if (cOff != null)
+          {
+            cOff.SetValue("", "Rename into --> *.disable");
+            cOff.SetValue("Icon", "SHELL32.dll,69");
+            cOff.SetValue("AppliesTo", "System.FileName:\"*.config\"");
+            var command = cOff.CreateSubKey("command");
+            if (command != null)
+            {
+              command.SetValue("", "\"" + appPath + "\" \"%1\" \"-disable\"");
+            }
+          }
         }
       }
       else if (result == System.Windows.Forms.DialogResult.No)
@@ -386,13 +398,37 @@
     private void ParseCommandLine()
     {
       var args = Environment.GetCommandLineArgs();
-      if (args.Length != 2)
+      var argsMax = 3;//
+
+      if (args.Length > 1 && args.Length < argsMax)
       {
-        return;
+        this.FilePathTextbox.Text = args[1];
+        this.UpdateSaveButton();
       }
 
-      this.FilePathTextbox.Text = args[1];
-      this.UpdateSaveButton();
+      if (args.Length == 3)
+      {
+        // process disabling.
+        if (args[2] == "-disable")
+        {
+          FileRenameDisable(args[1]);
+          Application.Exit();
+        }
+      }
+    }
+
+    protected virtual bool FileRenameDisable(string fullname)
+    {
+      // validate 2 names.
+      var disableExt = ".disable";
+      if (fullname.LastIndexOf(disableExt) == fullname.Length - disableExt.Length)
+      {
+        // done!!! cause it has the .disable at the end :P
+        return true;
+      }
+
+      File.Move(fullname, fullname + disableExt);
+      return true;
     }
 
     private void ReadSettings()
