@@ -252,7 +252,7 @@
       }
     }
 
-    private void UpdateMenuContextButton()
+    private void UpdateMenuContextButton(bool reset = false)
     {
       //Readme: https://paulkravchenko.wordpress.com/2010/11/03/add-cascading-menus-for-your-favorite-programs-in-windows-7-desktop-context-menu/
       //readme: http://www.cyberforum.ru/windows/thread617978.html
@@ -272,7 +272,10 @@
         if (keyConfigBuilder != null)
         {
           keyConfigBuilder.Close();
-          return;
+          if (!reset)
+          {
+            return;
+          }
         }
       }
       catch (Exception)
@@ -623,6 +626,11 @@
     private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
     {
       SaveSettings(sender, e);
+    }
+
+    private void toolStripStatusLabelResetRegistry_Click(object sender, EventArgs e)
+    {
+      UpdateMenuContextButton(true);
     }
   }
 }

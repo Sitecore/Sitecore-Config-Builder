@@ -55,6 +55,7 @@
       this.SitecoreVersionComboBox = new System.Windows.Forms.ComboBox();
       this.RequireDefaultConfiguration = new System.Windows.Forms.CheckBox();
       this.SaveButton = new System.Windows.Forms.Button();
+      this.toolStripStatusLabelResetRegistry = new System.Windows.Forms.ToolStripStatusLabel();
       this.StatusBar.SuspendLayout();
       this.ActionsGroup.SuspendLayout();
       this.groupBox1.SuspendLayout();
