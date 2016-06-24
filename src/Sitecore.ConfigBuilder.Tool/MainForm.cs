@@ -252,11 +252,27 @@
       }
     }
 
+    /// <summary>
+    /// Ask a user about registry with answers:
+    /// Yes - add to context menu.
+    /// No - never add it to context menu.
+    /// Cancel - skip for now.
+    /// </summary>
+    /// <returns>Return an answer from the user from MessageBox.Show</returns>
+    public static System.Windows.Forms.DialogResult AskUserToUpdateRegistry(bool NoWriteRights)
+    {
+      var msg1 = "Click Yes if you would you like to embed a menu-item into Windows Explorer context menu for all \"web.config\" files in the system?";
+      var msg2 = "If you want to enable this feature click Yes and re-run the application with Administrator privilegies.";
+      var msg3 = "Click Cancel if you want to skip it for now or No if you don't want to see this message any longer.";
+      var result = MessageBox.Show(
+        msg1 + Environment.NewLine + Environment.NewLine + (NoWriteRights ? (msg2 + Environment.NewLine + Environment.NewLine) : string.Empty) + msg3,
+        "ConfigBuilder settings",
+        MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+      return result;
+    }
+
     private void UpdateMenuContextButton(bool reset = false)
     {
-      //Readme: https://paulkravchenko.wordpress.com/2010/11/03/add-cascading-menus-for-your-favorite-programs-in-windows-7-desktop-context-menu/
-      //readme: http://www.cyberforum.ru/windows/thread617978.html
-
       var classesRoot = Registry.ClassesRoot;
       if (classesRoot == null)
       {
@@ -461,7 +477,8 @@
         this.BuildShowConfig.Checked = boolParse(settings, 4);
         this.BuildWebConfigResult.Checked = boolParse(settings, 5);
         this.RequireDefaultConfiguration.Checked = boolParse(settings, 6);
-        this.NeverAskMeAboutContextMenu = boolParse(settings, 7);
+        throw new NotImplementedException("NeverAskMeAboutContextMenu");
+        //this.NeverAskMeAboutContextMenu = boolParse(settings, 7);
       }
       catch (Exception)
       {

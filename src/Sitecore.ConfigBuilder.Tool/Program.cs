@@ -13,6 +13,7 @@ namespace Sitecore.ConfigBuilder.Tool
     {
       Application.EnableVisualStyles();
       Application.SetCompatibleTextRenderingDefault(false);
+      RegistryEditor.UpdateMenuContextButton();
       Application.Run(new MainForm());
     }
   }
