@@ -273,7 +273,7 @@
 
     private void UpdateMenuContextButton(bool reset = false)
     {
-      RegistryEditor.UpdateMenuContextButton(reset);
+      WinAPI.UpdateMenuContextButton(reset);
     }
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
@@ -326,37 +326,11 @@
     private void ParseCommandLine()
     {
       var args = Environment.GetCommandLineArgs();
-      var argsMax = 3;//
-
-      if (args.Length > 1 && args.Length < argsMax)
+      if (args.Length == 2)
       {
         this.FilePathTextbox.Text = args[1];
         this.UpdateSaveButton();
       }
-
-      if (args.Length == 3)
-      {
-        // process disabling.
-        if (args[2] == "-disable")
-        {
-          FileRenameDisable(args[1]);
-          Application.Exit();
-        }
-      }
-    }
-
-    protected virtual bool FileRenameDisable(string fullname)
-    {
-      // validate 2 names.
-      var disableExt = ".disable";
-      if (fullname.LastIndexOf(disableExt) == fullname.Length - disableExt.Length)
-      {
-        // done!!! cause it has the .disable at the end :P
-        return true;
-      }
-
-      File.Move(fullname, fullname + disableExt);
-      return true;
     }
 
     private void ReadSettings()
