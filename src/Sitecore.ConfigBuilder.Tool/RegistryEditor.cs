@@ -50,18 +50,18 @@ namespace Sitecore.ConfigBuilder.Tool
       {
         return;
       }
+      //Getting PATH of the ConfigBuilder.exe application.
+      var ConfigBuilderExePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sitecore.ConfigBuilder.Tool.exe");
 
-      var appPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sitecore.ConfigBuilder.Tool.exe");
-
-      RegistryKey keyConfigBuilder = null;
       try
       {
-        keyConfigBuilder = classesRoot.OpenSubKey(@"*\shell\Sitecore.ConfigBuilder", RegistryKeyPermissionCheck.ReadSubTree);
+        RegistryKey keyConfigBuilder = classesRoot.OpenSubKey(@"*\shell\Sitecore.ConfigBuilder", RegistryKeyPermissionCheck.ReadSubTree);
         if (keyConfigBuilder != null)
         {
           keyConfigBuilder.Close();
           if (!reset)
           {
+            // No need to Reset registry
             return;
           }
         }
@@ -77,6 +77,7 @@ namespace Sitecore.ConfigBuilder.Tool
       }
       catch (Exception)
       {
+        //I am not sure, whether we should catch any exception. It should be UnauthorizedAccessException
         NoWriteRights = true;
       }
       var result = MainForm.AskUserToUpdateRegistry(NoWriteRights);
@@ -89,32 +90,31 @@ namespace Sitecore.ConfigBuilder.Tool
         }
         else
         {
-          var key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
-          if (key != null)
-          {
-            key.SetValue("", "Open with Sitecore Config Builder");
-            key.SetValue("Icon", appPath);
-            key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
-            var command = key.CreateSubKey("command");
-            if (command != null)
-            {
-              command.SetValue("", "\"" + appPath + "\" \"%1\"");
-            }
-          }
+          RegistryKey key = default(RegistryKey);
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
+          key.SetValue("", "Open with Sitecore Config Builder");
+          key.SetValue("Icon", ConfigBuilderExePath);
+          key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
 
-          var cOff = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigDisable");
-          if (cOff != null)
-          {
-            cOff.SetValue("", "Rename into --> *.disable");
-            cOff.SetValue("Icon", "SHELL32.dll,69");
-            cOff.SetValue("AppliesTo", "System.FileName:\"*.config\"");
-            var command = cOff.CreateSubKey("command");
-            if (command != null)
-            {
-              command.SetValue("", "\"" + appPath + "\" \"%1\" \"-disable\"");
-            }
-          }
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder\command");
+          key.SetValue("", "\"" + ConfigBuilderExePath + "\" \"%1\"");
 
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigDisable");
+          key.SetValue("", "Rename into --> *.disable");
+          key.SetValue("Icon", "SHELL32.dll,69");
+          key.SetValue("AppliesTo", "System.FileName:\"*.config\"");
+
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigDisable\command");
+          key.SetValue("", "\"" + ConfigBuilderExePath + "\" \"%1\" \"-disable\"");
+
+
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigEnable");
+          key.SetValue("", "Remove *.disable extension");
+          key.SetValue("Icon", "SHELL32.dll,69");
+          key.SetValue("AppliesTo", "System.FileName:\"*.disable\"");
+
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigEnable\command");
+          key.SetValue("", "\"" + ConfigBuilderExePath + "\" \"%1\" \"-enable\"");
 
         }
       }
