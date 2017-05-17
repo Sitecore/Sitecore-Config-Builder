@@ -9,11 +9,11 @@
   using System.Runtime.Remoting.Messaging;
   using System.Windows.Forms;
   using System.Xml.Linq;
-  using Microsoft.Win32;
+  using JetBrains.Annotations;
   using Sitecore.Diagnostics.Base;
-  using Sitecore.Diagnostics.Base.Annotations;
   using Sitecore.Diagnostics.ConfigBuilder;
-  using Sitecore.Diagnostics.InformationService.Client;
+  using Sitecore.Diagnostics.InfoService.Client;
+  using Sitecore.Diagnostics.InfoService.Client.Model;
 
   internal partial class MainForm : Form
   {
@@ -98,17 +98,21 @@
             try
             {
               var versionInfos = new ServiceClient().GetVersions("Sitecore CMS");
-              var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
-              var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Name));
+              var versionInfo = versionInfos.First(x => version.StartsWith(x.MajorMinor));
+              var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Key));
 
               var defaultShowConfig = outputShowConfigFile + "." + version + ".xml";
-              releaseInfo.Defaults.Configs.ShowConfig.Save(defaultShowConfig);
-              Normalizer.Normalize(defaultShowConfig, GetNormalizedPath(defaultShowConfig));
+              var defaults = releaseInfo.Value.DefaultDistribution.Defaults;
+              Assert.IsNotNull(defaults, $"Defaults are not available for {version}");
+
+              defaults.Configs.ShowConfig.Save(defaultShowConfig);
+              var normalizer = new Normalizer();
+              normalizer.Normalize(defaultShowConfig, GetNormalizedPath(defaultShowConfig));
               if (buildWebConfigResult)
               {
                 var defaultWebConfigResult = outputWebConfigFile + "." + version + ".xml";
-                releaseInfo.Defaults.Configs.Configuration.Save(defaultWebConfigResult);
-                Normalizer.Normalize(defaultWebConfigResult, GetNormalizedPath(defaultWebConfigResult));
+                defaults.Configs.Configuration.Save(defaultWebConfigResult);
+                normalizer.Normalize(defaultWebConfigResult, GetNormalizedPath(defaultWebConfigResult));
               }
             }
             catch (Exception ex)
@@ -235,13 +239,24 @@
         this.ParseCommandLine();
         this.ReadSettings();
         UpdateMenuContextButton();
-        //new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
         new ToDoHandler(() =>
         {
-          var vList = new List<Diagnostics.InformationService.Client.Model.IRelease>();
-          foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
-            vList.AddRange(vv.Releases.ToArray());
-          return vList.Select(vv => string.Format("{0} ({1})", vv.Name, vv.Label)).ToArray();
+          try
+          {
+            var vList = new List<IRelease>();
+            foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
+            {
+              vList.AddRange(vv.Releases.Values);
+            }
+
+            return vList.Select(vv => $"{vv.Version.MajorMinor} ({vv.Label})").ToArray();
+          }
+          catch (Exception ex)
+          {
+            MessageBox.Show($"An issue occurred while updating available versions combobox. \r\nException: {ex.GetType().FullName}\r\nMessage: {ex.Message}");
+
+            return new string[0];
+          }
         }).BeginInvoke(PopulateVersionsComboBox, null);
         this.Text = string.Format(this.Text ?? string.Empty, GetVersion());
       }
@@ -550,7 +565,7 @@
           return;
         }
 
-        Normalizer.Normalize(showconfigPath, GetNormalizedPath(showconfigPath));
+        new Normalizer().Normalize(showconfigPath, GetNormalizedPath(showconfigPath));
 
         if (this.OpenFolder.Checked && File.Exists(outputFile))
         {
