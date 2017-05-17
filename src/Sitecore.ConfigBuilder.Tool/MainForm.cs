@@ -278,31 +278,39 @@
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
     {
-      var result1 = (AsyncResult)asyncRes;
-      var result = ((ToDoHandler)result1.AsyncDelegate).EndInvoke(asyncRes);
-      Action method = delegate
+      try
       {
-        if (result != null)
+        var result1 = (AsyncResult)asyncRes;
+        var result = ((ToDoHandler)result1.AsyncDelegate).EndInvoke(asyncRes);
+        Action method = delegate
         {
-          object[] items = result.ToArray<object>();
-          this.SitecoreVersionComboBox.Items.AddRange(items);
-          if (this.SitecoreVersionComboBox.Items.Count > 0)
+          if (result != null)
           {
-            this.SitecoreVersionComboBox.SelectedIndex = 0;
-            if (this.FilePathTextbox.Text.Trim(" \"".ToCharArray()).Length > 0)
+            object[] items = result.ToArray<object>();
+            this.SitecoreVersionComboBox.Items.AddRange(items);
+            if (this.SitecoreVersionComboBox.Items.Count > 0)
             {
-              UpdateSaveButton();
+              this.SitecoreVersionComboBox.SelectedIndex = 0;
+              if (this.FilePathTextbox.Text.Trim(" \"".ToCharArray()).Length > 0)
+              {
+                UpdateSaveButton();
+              }
             }
           }
+        };
+        if (this.SitecoreVersionComboBox.InvokeRequired)
+        {
+          this.Invoke(method);
         }
-      };
-      if (this.SitecoreVersionComboBox.InvokeRequired)
-      {
-        this.Invoke(method);
+        else
+        {
+          method();
+        }
+
       }
-      else
+      catch (Exception ex)
       {
-        method();
+        MessageBox.Show($"An issue occurred while updating available versions combobox. \r\nException: {ex.GetType().FullName}\r\nMessage: {ex.Message}");
       }
     }
 
