@@ -55,6 +55,7 @@
       this.SitecoreVersionComboBox = new System.Windows.Forms.ComboBox();
       this.RequireDefaultConfiguration = new System.Windows.Forms.CheckBox();
       this.SaveButton = new System.Windows.Forms.Button();
+      this.toolStripStatusLabelResetRegistry = new System.Windows.Forms.ToolStripStatusLabel();
       this.StatusBar.SuspendLayout();
       this.ActionsGroup.SuspendLayout();
       this.groupBox1.SuspendLayout();
@@ -67,10 +68,11 @@
       // StatusBar
       // 
       this.StatusBar.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.ErrorLabel});
-      this.StatusBar.Location = new System.Drawing.Point(0, 375);
+            this.ErrorLabel,
+            this.toolStripStatusLabelResetRegistry});
+      this.StatusBar.Location = new System.Drawing.Point(0, 373);
       this.StatusBar.Name = "StatusBar";
-      this.StatusBar.Size = new System.Drawing.Size(503, 22);
+      this.StatusBar.Size = new System.Drawing.Size(503, 24);
       this.StatusBar.SizingGrip = false;
       this.StatusBar.TabIndex = 15;
       this.StatusBar.Text = "statusStrip1";
@@ -78,7 +80,8 @@
       // ErrorLabel
       // 
       this.ErrorLabel.Name = "ErrorLabel";
-      this.ErrorLabel.Size = new System.Drawing.Size(39, 17);
+      this.ErrorLabel.Size = new System.Drawing.Size(376, 19);
+      this.ErrorLabel.Spring = true;
       this.ErrorLabel.Text = "Ready";
       // 
       // ActionsGroup
@@ -325,6 +328,17 @@
       this.SaveButton.UseVisualStyleBackColor = true;
       this.SaveButton.Click += new System.EventHandler(this.SaveButton_Click);
       // 
+      // toolStripStatusLabelResetRegistry
+      // 
+      this.toolStripStatusLabelResetRegistry.BorderSides = ((System.Windows.Forms.ToolStripStatusLabelBorderSides)((((System.Windows.Forms.ToolStripStatusLabelBorderSides.Left | System.Windows.Forms.ToolStripStatusLabelBorderSides.Top) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Right) 
+            | System.Windows.Forms.ToolStripStatusLabelBorderSides.Bottom)));
+      this.toolStripStatusLabelResetRegistry.BorderStyle = System.Windows.Forms.Border3DStyle.RaisedInner;
+      this.toolStripStatusLabelResetRegistry.Name = "toolStripStatusLabelResetRegistry";
+      this.toolStripStatusLabelResetRegistry.Size = new System.Drawing.Size(81, 19);
+      this.toolStripStatusLabelResetRegistry.Text = "Reset registry";
+      this.toolStripStatusLabelResetRegistry.Click += new System.EventHandler(this.toolStripStatusLabelResetRegistry_Click);
+      // 
       // MainForm
       // 
       this.AllowDrop = true;
@@ -394,6 +408,7 @@
     private System.Windows.Forms.ComboBox SitecoreVersionComboBox;
     private System.Windows.Forms.CheckBox RequireDefaultConfiguration;
     private System.Windows.Forms.Button SaveButton;
+    private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabelResetRegistry;
   }
 }
 

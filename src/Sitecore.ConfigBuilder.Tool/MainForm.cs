@@ -9,11 +9,11 @@
   using System.Runtime.Remoting.Messaging;
   using System.Windows.Forms;
   using System.Xml.Linq;
-  using Microsoft.Win32;
+  using JetBrains.Annotations;
   using Sitecore.Diagnostics.Base;
-  using Sitecore.Diagnostics.Base.Annotations;
   using Sitecore.Diagnostics.ConfigBuilder;
-  using Sitecore.Diagnostics.InformationService.Client;
+  using Sitecore.Diagnostics.InfoService.Client;
+  using Sitecore.Diagnostics.InfoService.Client.Model;
 
   internal partial class MainForm : Form
   {
@@ -98,17 +98,21 @@
             try
             {
               var versionInfos = new ServiceClient().GetVersions("Sitecore CMS");
-              var versionInfo = versionInfos.First(x => version.StartsWith(x.Name));
-              var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Name));
+              var versionInfo = versionInfos.First(x => version.StartsWith(x.MajorMinor));
+              var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Key));
 
               var defaultShowConfig = outputShowConfigFile + "." + version + ".xml";
-              releaseInfo.Defaults.Configs.ShowConfig.Save(defaultShowConfig);
-              Normalizer.Normalize(defaultShowConfig, GetNormalizedPath(defaultShowConfig));
+              var defaults = releaseInfo.Value.DefaultDistribution.Defaults;
+              Assert.IsNotNull(defaults, $"Defaults are not available for {version}");
+
+              defaults.Configs.ShowConfig.Save(defaultShowConfig);
+              var normalizer = new Normalizer();
+              normalizer.Normalize(defaultShowConfig, GetNormalizedPath(defaultShowConfig));
               if (buildWebConfigResult)
               {
                 var defaultWebConfigResult = outputWebConfigFile + "." + version + ".xml";
-                releaseInfo.Defaults.Configs.Configuration.Save(defaultWebConfigResult);
-                Normalizer.Normalize(defaultWebConfigResult, GetNormalizedPath(defaultWebConfigResult));
+                defaults.Configs.Configuration.Save(defaultWebConfigResult);
+                normalizer.Normalize(defaultWebConfigResult, GetNormalizedPath(defaultWebConfigResult));
               }
             }
             catch (Exception ex)
@@ -235,13 +239,24 @@
         this.ParseCommandLine();
         this.ReadSettings();
         UpdateMenuContextButton();
-        //new Action(() => PopulateVersionsComboBox()).BeginInvoke(null, null);
         new ToDoHandler(() =>
         {
-          var vList = new List<Diagnostics.InformationService.Client.Model.IRelease>();
-          foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
-            vList.AddRange(vv.Releases.ToArray());
-          return vList.Select(vv => string.Format("{0} ({1})", vv.Name, vv.Label)).ToArray();
+          try
+          {
+            var vList = new List<IRelease>();
+            foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
+            {
+              vList.AddRange(vv.Releases.Values);
+            }
+
+            return vList.Select(vv => $"{vv.Version.MajorMinor} ({vv.Label})").ToArray();
+          }
+          catch (Exception ex)
+          {
+            MessageBox.Show($"An issue occurred while updating available versions combobox. \r\nException: {ex.GetType().FullName}\r\nMessage: {ex.Message}");
+
+            return new string[0];
+          }
         }).BeginInvoke(PopulateVersionsComboBox, null);
         this.Text = string.Format(this.Text ?? string.Empty, GetVersion());
       }
@@ -252,111 +267,65 @@
       }
     }
 
-    private void UpdateMenuContextButton()
+    /// <summary>
+    /// Ask a user about registry with answers:
+    /// Yes - add to context menu.
+    /// No - never add it to context menu.
+    /// Cancel - skip for now.
+    /// </summary>
+    /// <returns>Return an answer from the user from MessageBox.Show</returns>
+    public static System.Windows.Forms.DialogResult AskUserToUpdateRegistry(bool NoWriteRights)
     {
-      var classesRoot = Registry.ClassesRoot;
-      if (classesRoot == null)
-      {
-        return;
-      }
-
-      var appPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Sitecore.ConfigBuilder.Tool.exe");
-
-      RegistryKey keyConfigBuilder = null;
-      try
-      {
-        keyConfigBuilder = classesRoot.OpenSubKey(@"*\shell\Sitecore.ConfigBuilder", RegistryKeyPermissionCheck.ReadSubTree);
-        if (keyConfigBuilder != null)
-        {
-          keyConfigBuilder.Close();
-          return;
-        }
-      }
-      catch (Exception)
-      {
-        throw new System.Security.SecurityException(@"Don't have read access to the registry: hkcr\*\shell\Sitecore.ConfigBuilder");
-      }
-
       var msg1 = "Click Yes if you would you like to embed a menu-item into Windows Explorer context menu for all \"web.config\" files in the system?";
       var msg2 = "If you want to enable this feature click Yes and re-run the application with Administrator privilegies.";
       var msg3 = "Click Cancel if you want to skip it for now or No if you don't want to see this message any longer.";
-      bool NoWriteRights = false;
-
-      try
-      {
-        classesRoot.CreateSubKey(@"*\shell\");
-      }
-      catch (Exception)
-      {
-        NoWriteRights = true;
-      }
-
-      if (NeverAskMeAboutContextMenu)
-      {
-        return;
-      }
-
       var result = MessageBox.Show(
         msg1 + Environment.NewLine + Environment.NewLine + (NoWriteRights ? (msg2 + Environment.NewLine + Environment.NewLine) : string.Empty) + msg3,
         "ConfigBuilder settings",
         MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
+      return result;
+    }
 
-      if (result == System.Windows.Forms.DialogResult.Yes)
-      {
-        if (NoWriteRights)
-        {
-          Application.Exit();
-          return;
-        }
-        else
-        {
-          var key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder");
-          if (key != null)
-          {
-            key.SetValue("", "Open with Sitecore Config Builder");
-            key.SetValue("Icon", appPath);
-            key.SetValue("AppliesTo", "System.FileName:\"web.config\"");
-            var command = key.CreateSubKey("command");
-            if (command != null)
-            {
-              command.SetValue("", "\"" + appPath + "\" \"%1\"");
-            }
-          }
-        }
-      }
-      else if (result == System.Windows.Forms.DialogResult.No)
-      {
-        NeverAskMeAboutContextMenu = true;
-      }
+    private void UpdateMenuContextButton(bool reset = false)
+    {
+      WinAPI.UpdateMenuContextButton(reset);
     }
 
     private void PopulateVersionsComboBox(IAsyncResult asyncRes)
     {
-      var result1 = (AsyncResult)asyncRes;
-      var result = ((ToDoHandler)result1.AsyncDelegate).EndInvoke(asyncRes);
-      Action method = delegate
+      try
       {
-        if (result != null)
+        var result1 = (AsyncResult)asyncRes;
+        var result = ((ToDoHandler)result1.AsyncDelegate).EndInvoke(asyncRes);
+        Action method = delegate
         {
-          object[] items = result.ToArray<object>();
-          this.SitecoreVersionComboBox.Items.AddRange(items);
-          if (this.SitecoreVersionComboBox.Items.Count > 0)
+          if (result != null)
           {
-            this.SitecoreVersionComboBox.SelectedIndex = 0;
-            if (this.FilePathTextbox.Text.Trim(" \"".ToCharArray()).Length > 0)
+            object[] items = result.ToArray<object>();
+            this.SitecoreVersionComboBox.Items.AddRange(items);
+            if (this.SitecoreVersionComboBox.Items.Count > 0)
             {
-              UpdateSaveButton();
+              this.SitecoreVersionComboBox.SelectedIndex = 0;
+              if (this.FilePathTextbox.Text.Trim(" \"".ToCharArray()).Length > 0)
+              {
+                UpdateSaveButton();
+              }
             }
           }
+        };
+        if (this.SitecoreVersionComboBox.InvokeRequired)
+        {
+          this.Invoke(method);
         }
-      };
-      if (this.SitecoreVersionComboBox.InvokeRequired)
-      {
-        this.Invoke(method);
+        else
+        {
+          method();
+        }
+
       }
-      else
+      catch (Exception ex)
       {
-        method();
+        MessageBox.Show($"An issue occurred while updating available versions combobox. \r\nException: {ex.GetType().FullName}\r\nMessage: {ex.Message}");
       }
     }
 
@@ -380,13 +349,11 @@
     private void ParseCommandLine()
     {
       var args = Environment.GetCommandLineArgs();
-      if (args.Length != 2)
+      if (args.Length == 2)
       {
-        return;
+        this.FilePathTextbox.Text = args[1];
+        this.UpdateSaveButton();
       }
-
-      this.FilePathTextbox.Text = args[1];
-      this.UpdateSaveButton();
     }
 
     private void ReadSettings()
@@ -419,7 +386,8 @@
         this.BuildShowConfig.Checked = boolParse(settings, 4);
         this.BuildWebConfigResult.Checked = boolParse(settings, 5);
         this.RequireDefaultConfiguration.Checked = boolParse(settings, 6);
-        this.NeverAskMeAboutContextMenu = boolParse(settings, 7);
+        throw new NotImplementedException("NeverAskMeAboutContextMenu");
+        //this.NeverAskMeAboutContextMenu = boolParse(settings, 7);
       }
       catch (Exception)
       {
@@ -597,7 +565,7 @@
           return;
         }
 
-        Normalizer.Normalize(showconfigPath, GetNormalizedPath(showconfigPath));
+        new Normalizer().Normalize(showconfigPath, GetNormalizedPath(showconfigPath));
 
         if (this.OpenFolder.Checked && File.Exists(outputFile))
         {
@@ -620,6 +588,11 @@
     private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
     {
       SaveSettings(sender, e);
+    }
+
+    private void toolStripStatusLabelResetRegistry_Click(object sender, EventArgs e)
+    {
+      UpdateMenuContextButton(true);
     }
   }
 }

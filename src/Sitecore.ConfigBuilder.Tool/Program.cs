@@ -13,7 +13,19 @@ namespace Sitecore.ConfigBuilder.Tool
     {
       Application.EnableVisualStyles();
       Application.SetCompatibleTextRenderingDefault(false);
-      Application.Run(new MainForm());
+      WinAPI.UpdateMenuContextButton();
+      switch (WinAPI.TestCommandLine())
+      {
+        case WinAPI.StartOption.StartApp:
+          Application.Run(new MainForm());
+          break;
+        case WinAPI.StartOption.ConfigDisable:
+          WinAPI.FileRenameDisable();
+          break;
+        case WinAPI.StartOption.ConfigEnable:
+          WinAPI.FileRenameEnable();
+          break;
+      }
     }
   }
 }
