@@ -7,3 +7,4 @@ src/Sitecore.Diagnsotics.InformationService.Client/bin/
 *.suo
 src/packages/
 src/Sitecore.ConfigBuilder.Tool/obj/
+src/Sitecore.ConfigBuilder.Tool/bin/
