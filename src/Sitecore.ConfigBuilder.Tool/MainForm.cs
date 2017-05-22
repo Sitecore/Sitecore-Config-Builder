@@ -60,7 +60,8 @@
         var buildWebConfigResult = this.BuildWebConfigResult.Checked;
         var normalizeOutput = this.NormalizeOutput.Checked;
         var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
-        var version = this.SitecoreVersionComboBox.Text;
+        var selectedItem = (ComboboxItem)this.SitecoreVersionComboBox.SelectedItem;
+        var releaseInfo = selectedItem.Value;
 
         var outputShowConfigFile = this.GetShowConfigFilePath(ShowconfigFileName);
 
@@ -93,24 +94,21 @@
 
         if (requireDefaultConfiguration)
         {
-          if (!string.IsNullOrEmpty(version))
+          if (releaseInfo != null)
           {
             try
             {
-              var versionInfos = new ServiceClient().GetVersions("Sitecore CMS");
-              var versionInfo = versionInfos.First(x => version.StartsWith(x.MajorMinor));
-              var releaseInfo = versionInfo.Releases.First(x => version.StartsWith(x.Key));
-
-              var defaultShowConfig = outputShowConfigFile + "." + version + ".xml";
-              var defaults = releaseInfo.Value.DefaultDistribution.Defaults;
-              Assert.IsNotNull(defaults, $"Defaults are not available for {version}");
+              var release = releaseInfo.Version.MajorMinorUpdate;
+              var defaultShowConfig = outputShowConfigFile + "." + release + ".xml";
+              var defaults = releaseInfo.DefaultDistribution.Defaults;
+              Assert.IsNotNull(defaults, $"Defaults are not available for {release}");
 
               defaults.Configs.ShowConfig.Save(defaultShowConfig);
               var normalizer = new Normalizer();
               normalizer.Normalize(defaultShowConfig, GetNormalizedPath(defaultShowConfig));
               if (buildWebConfigResult)
               {
-                var defaultWebConfigResult = outputWebConfigFile + "." + version + ".xml";
+                var defaultWebConfigResult = outputWebConfigFile + "." + release + ".xml";
                 defaults.Configs.Configuration.Save(defaultWebConfigResult);
                 normalizer.Normalize(defaultWebConfigResult, GetNormalizedPath(defaultWebConfigResult));
               }
@@ -249,13 +247,13 @@
               vList.AddRange(vv.Releases.Values);
             }
 
-            return vList.Select(vv => $"{vv.Version.MajorMinor} ({vv.Label})").ToArray();
+            return vList;
           }
           catch (Exception ex)
           {
             MessageBox.Show($"An issue occurred while updating available versions combobox. \r\nException: {ex.GetType().FullName}\r\nMessage: {ex.Message}");
 
-            return new string[0];
+            return new IRelease[0];
           }
         }).BeginInvoke(PopulateVersionsComboBox, null);
         this.Text = string.Format(this.Text ?? string.Empty, GetVersion());
@@ -301,7 +299,7 @@
         {
           if (result != null)
           {
-            object[] items = result.ToArray<object>();
+            var items = result.Select(x => new ComboboxItem($"{x.Version.MajorMinor} ({x.Label})", x)).ToArray<object>();
             this.SitecoreVersionComboBox.Items.AddRange(items);
             if (this.SitecoreVersionComboBox.Items.Count > 0)
             {
@@ -329,7 +327,24 @@
       }
     }
 
-    private delegate IEnumerable<string> ToDoHandler();
+    private class ComboboxItem
+    {
+      [NotNull]
+      public string Key { get; }
+
+      [NotNull]
+      public IRelease Value { get; }
+
+      public ComboboxItem([NotNull] string key, [NotNull] IRelease value)
+      {
+        Key = key;
+        Value = value;
+      }
+
+      public override string ToString() => Key;
+    }
+
+    private delegate IEnumerable<IRelease> ToDoHandler();
 
     [NotNull]
     private string GetVersion()
