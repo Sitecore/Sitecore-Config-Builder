@@ -20,5 +20,4 @@ The sources are open for inspection by everybody, please fork and improve if you
 
 ### Use its API
 
-This repository contains only UI part of the application, the engine is distributed in a separate repository:
-https://github.com/Sitecore/Sitecore.Diagnostics.ConfigBuilder
+This repository contains only UI part of the application, the engine is available as Sitecore.Diagnostics.ConfigBuilder NuGet package.
