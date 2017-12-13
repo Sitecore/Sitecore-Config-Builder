@@ -4,7 +4,9 @@
   using System.Collections.Generic;
   using System.Diagnostics;
   using System.IO;
+  using System.IO.Compression;
   using System.Linq;
+  using System.Net;
   using System.Reflection;
   using System.Runtime.Remoting.Messaging;
   using System.Windows.Forms;
@@ -94,7 +96,57 @@
 
         if (requireDefaultConfiguration)
         {
-          if (releaseInfo != null)
+
+
+          var websiteFolder = Path.GetDirectoryName(webConfigPath);
+          if (string.Equals(websiteFolder, Path.GetDirectoryName(outputShowConfigFile)))
+          {
+            websiteFolder += " " + releaseInfo.Version.MajorMinorUpdate;
+            webConfigPath = Path.Combine(websiteFolder, Path.GetFileName(webConfigPath));
+            outputShowConfigFile = Path.Combine(websiteFolder, Path.GetFileName(outputShowConfigFile));
+
+            Directory.Delete(websiteFolder, true);
+
+            {
+              var filesZipPath = Path.GetTempFileName();
+              new WebClient()
+                .DownloadFile(releaseInfo.DefaultDistribution.Defaults.Configs.FilesUrl, filesZipPath);
+
+              var tempFolder = Path.GetTempFileName();
+              File.Delete(tempFolder);
+              Directory.CreateDirectory(tempFolder);
+
+              ZipFile.ExtractToDirectory(filesZipPath, tempFolder);
+
+              tempFolder =
+                (
+                  Directory.GetDirectories(tempFolder, "Website", SearchOption.AllDirectories).First());
+              Directory.Move(tempFolder, websiteFolder);
+
+              var outputWebConfigFile1 = string.Empty;
+              if (buildWebConfigResult)
+              {
+                outputWebConfigFile1 = Path.Combine(websiteFolder, "web.config.result.xml");
+                Assert.IsNotNull(outputWebConfigFile1, "outputWebConfigFile");
+              }
+
+              Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, false).Save(outputShowConfigFile);
+              if (normalizeOutput)
+              {
+                Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
+              }
+
+              if (buildWebConfigResult)
+              {
+                Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, false).Save(outputWebConfigFile1);
+                if (normalizeOutput)
+                {
+                  Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile1));
+                }
+              }
+            }
+          }
+          else
           {
             try
             {
