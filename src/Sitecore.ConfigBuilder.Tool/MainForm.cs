@@ -14,6 +14,9 @@
   using JetBrains.Annotations;
   using Sitecore.Diagnostics.Base;
   using Sitecore.Diagnostics.ConfigBuilder;
+  using Sitecore.Diagnostics.FileSystem;
+  using Sitecore.Diagnostics.FileSystem.Extensions;
+  using Sitecore.Diagnostics.FileSystem.Zip;
   using Sitecore.Diagnostics.InfoService.Client;
   using Sitecore.Diagnostics.InfoService.Client.Model;
 
@@ -58,7 +61,8 @@
     {
       try
       {
-        var webConfigPath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
+        var originalWebConfigPath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
+        var webConfigPath = originalWebConfigPath;
         var buildWebConfigResult = this.BuildWebConfigResult.Checked;
         var normalizeOutput = this.NormalizeOutput.Checked;
         var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
@@ -104,7 +108,7 @@
             websiteFolder += " " + releaseInfo.Version.MajorMinorUpdate;
             webConfigPath = Path.Combine(websiteFolder, Path.GetFileName(webConfigPath));
             outputShowConfigFile = Path.Combine(websiteFolder, Path.GetFileName(outputShowConfigFile));
-
+            Directory.CreateDirectory(websiteFolder);
             Directory.Delete(websiteFolder, true);
 
             {
@@ -112,16 +116,14 @@
               new WebClient()
                 .DownloadFile(releaseInfo.DefaultDistribution.Defaults.Configs.FilesUrl, filesZipPath);
 
-              var tempFolder = Path.GetTempFileName();
-              File.Delete(tempFolder);
-              Directory.CreateDirectory(tempFolder);
+              var fileSystem = new FileSystem();
+              var tempFolder = fileSystem.CreateUniqueTempFolder() as IDirectory;
 
-              ZipFile.ExtractToDirectory(filesZipPath, tempFolder);
-
-              tempFolder =
-                (
-                  Directory.GetDirectories(tempFolder, "Website", SearchOption.AllDirectories).First());
-              Directory.Move(tempFolder, websiteFolder);
+              fileSystem.ParseFile(filesZipPath).ExtractZipToDirectory(fileSystem.ParseDirectory(tempFolder), 
+              (entry, exception) => B(entry, exception));
+              
+              tempFolder = tempFolder.GetDirectories("Website", SearchOption.AllDirectories).First();
+              tempFolder.MoveTo(websiteFolder);
 
               var outputWebConfigFile1 = string.Empty;
               if (buildWebConfigResult)
@@ -188,6 +190,11 @@
         MessageBox.Show("The action failed with exception. " + ex.Message + Environment.NewLine + "Find details in the ConfigBuilder.ConfigBuilder.dll.log file", "Sitecore ConfigBuilder");
         File.AppendAllText("ConfigBuilder.ConfigBuilder.dll.log", DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss") + " ERROR " + ex.GetType().FullName + Environment.NewLine + "Message: " + ex.Message + Environment.NewLine + "Stack trace:" + Environment.NewLine + ex.StackTrace + Environment.NewLine);
       }
+    }
+
+    private static bool B(IZipArchiveEntry entry, Exception exception)
+    {
+      return true;
     }
 
     private static string GetNormalizedPath(string defaultWebConfigResult)
@@ -293,13 +300,7 @@
         {
           try
           {
-            var vList = new List<IRelease>();
-            foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
-            {
-              vList.AddRange(vv.Releases.Values);
-            }
-
-            return vList;
+            return new ServiceClient().GetVersions("Sitecore CMS").Reverse().ToArray();
           }
           catch (Exception ex)
           {
