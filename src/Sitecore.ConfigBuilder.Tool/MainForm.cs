@@ -293,13 +293,7 @@
         {
           try
           {
-            var vList = new List<IRelease>();
-            foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
-            {
-              vList.AddRange(vv.Releases.Values);
-            }
-
-            return vList;
+            return ServiceClient.Create().GetVersions("Sitecore CMS");
           }
           catch (Exception ex)
           {
