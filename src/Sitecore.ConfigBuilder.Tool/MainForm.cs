@@ -79,18 +79,18 @@
           Assert.IsNotNull(outputWebConfigFile, "outputWebConfigFile");
         }
 
-        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, false).Save(outputShowConfigFile);
+        ConfigBuilderProxy.Build(webConfigPath, false, false).Save(outputShowConfigFile);
         if (normalizeOutput)
         {
-          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
+          ConfigBuilderProxy.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
         }
 
         if (buildWebConfigResult)
         {
-          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, false).Save(outputWebConfigFile);
+          ConfigBuilderProxy.Build(webConfigPath, true, false).Save(outputWebConfigFile);
           if (normalizeOutput)
           {
-            Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile));
+            ConfigBuilderProxy.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile));
           }
         }
 
@@ -130,18 +130,18 @@
                 Assert.IsNotNull(outputWebConfigFile1, "outputWebConfigFile");
               }
 
-              Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, false).Save(outputShowConfigFile);
+              ConfigBuilderProxy.Build(webConfigPath, false, false).Save(outputShowConfigFile);
               if (normalizeOutput)
               {
-                Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
+                ConfigBuilderProxy.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
               }
 
               if (buildWebConfigResult)
               {
-                Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, false).Save(outputWebConfigFile1);
+                ConfigBuilderProxy.Build(webConfigPath, true, false).Save(outputWebConfigFile1);
                 if (normalizeOutput)
                 {
-                  Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile1));
+                  ConfigBuilderProxy.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile1));
                 }
               }
             }
