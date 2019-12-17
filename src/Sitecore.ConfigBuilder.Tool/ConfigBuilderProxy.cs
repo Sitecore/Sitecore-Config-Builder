@@ -76,8 +76,11 @@ namespace Sitecore.ConfigBuilder.Tool
           string destFolder = Path.GetDirectoryName(pair.Key);
           string fileName = Path.GetFileName(pair.Value);
           string destFullPath = Path.Combine(destFolder, fileName);
-          File.Copy(pair.Value, destFullPath);
-          createdFiles.Add(destFullPath);
+          if (!File.Exists(destFullPath))
+          {
+            File.Copy(pair.Value, destFullPath);
+            createdFiles.Add(destFullPath);
+          }          
         }
       }
       return createdFiles;
