@@ -109,6 +109,19 @@ namespace Sitecore.ConfigBuilder.Tool
       }
     }
 
+    public static string ConvertLinkToRealFile(string linkPath)
+    {
+      string result = linkPath;
+      if (!string.IsNullOrWhiteSpace(linkPath) && linkPath.EndsWith(linkExtension))
+      {
+        var dict = new Dictionary<string, string>();
+        dict.Add(string.Empty, linkPath);
+        ConvertLinkToRealFile(dict);
+        result = dict[string.Empty];
+      }
+      return result;
+    }
+
     public static XmlDocument Build(string webConfigFilePath, bool buildWebConfigResult, bool normalizeOutput)
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
