@@ -79,8 +79,8 @@ namespace Sitecore.ConfigBuilder.Tool
           if (!File.Exists(destFullPath))
           {
             File.Copy(pair.Value, destFullPath);
-            createdFiles.Add(destFullPath);
-          }          
+            // createdFiles.Add(destFullPath); usage in future is expected
+          }
         }
       }
       return createdFiles;
@@ -126,7 +126,7 @@ namespace Sitecore.ConfigBuilder.Tool
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       XmlDocument result = Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, buildWebConfigResult, normalizeOutput);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles); usage in future is expected
       return result;
     }
 
@@ -134,7 +134,7 @@ namespace Sitecore.ConfigBuilder.Tool
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       XmlDocument result = Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, buildWebConfigResult, normalizeOutput, fileSystem);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles);  usage in future is expected
       return result;
     }
 
@@ -142,14 +142,14 @@ namespace Sitecore.ConfigBuilder.Tool
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, outputFilePath, buildWebConfigResult, normalizeOutput);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles); usage in future is expected
     }
 
     public static void Build(string webConfigFilePath, string outputFilePath, bool buildWebConfigResult, bool normalizeOutput, IFileSystem fileSystem)
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, outputFilePath, buildWebConfigResult, normalizeOutput, fileSystem);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles); usage in future is expected
     }
   }
 }
