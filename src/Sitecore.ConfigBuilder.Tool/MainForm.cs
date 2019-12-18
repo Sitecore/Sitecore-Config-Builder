@@ -294,7 +294,7 @@
         {
           try
           {
-            return ServiceClient.Create().GetVersions("Sitecore CMS");
+            return ServiceClient.Create().GetVersions("Sitecore CMS").OrderByDescending(v => v.Version.MajorMinorUpdateInt);
           }
           catch (Exception ex)
           {
