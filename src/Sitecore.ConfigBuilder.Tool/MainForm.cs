@@ -21,7 +21,7 @@
   {
     #region Fields and Constants
 
-    private const string WebConfigOpenFilter = "*.config|*.config|Any file|*";
+    private const string WebConfigOpenFilter = "*.config|*.config|*.link|*.link|Any file|*";
 
     private const string SaveFilter = "*.xml|*.xml|Any file|*";
 
@@ -59,6 +59,7 @@
       try
       {
         var webConfigPath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
+        webConfigPath = ConfigBuilderProxy.ConvertLinkToRealFile(webConfigPath);
         var buildWebConfigResult = this.BuildWebConfigResult.Checked;
         var normalizeOutput = this.NormalizeOutput.Checked;
         var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
@@ -293,7 +294,7 @@
         {
           try
           {
-            return ServiceClient.Create().GetVersions("Sitecore CMS");
+            return ServiceClient.Create().GetVersions("Sitecore CMS").OrderByDescending(v => v.Version.MajorMinorUpdateInt);
           }
           catch (Exception ex)
           {

@@ -76,8 +76,11 @@ namespace Sitecore.ConfigBuilder.Tool
           string destFolder = Path.GetDirectoryName(pair.Key);
           string fileName = Path.GetFileName(pair.Value);
           string destFullPath = Path.Combine(destFolder, fileName);
-          File.Copy(pair.Value, destFullPath);
-          createdFiles.Add(destFullPath);
+          if (!File.Exists(destFullPath))
+          {
+            File.Copy(pair.Value, destFullPath);
+            // createdFiles.Add(destFullPath); usage in future is expected
+          }
         }
       }
       return createdFiles;
@@ -106,11 +109,24 @@ namespace Sitecore.ConfigBuilder.Tool
       }
     }
 
+    public static string ConvertLinkToRealFile(string linkPath)
+    {
+      string result = linkPath;
+      if (!string.IsNullOrWhiteSpace(linkPath) && linkPath.EndsWith(linkExtension))
+      {
+        var dict = new Dictionary<string, string>();
+        dict.Add(string.Empty, linkPath);
+        ConvertLinkToRealFile(dict);
+        result = dict[string.Empty];
+      }
+      return result;
+    }
+
     public static XmlDocument Build(string webConfigFilePath, bool buildWebConfigResult, bool normalizeOutput)
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       XmlDocument result = Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, buildWebConfigResult, normalizeOutput);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles); usage in future is expected
       return result;
     }
 
@@ -118,7 +134,7 @@ namespace Sitecore.ConfigBuilder.Tool
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       XmlDocument result = Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, buildWebConfigResult, normalizeOutput, fileSystem);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles);  usage in future is expected
       return result;
     }
 
@@ -126,14 +142,14 @@ namespace Sitecore.ConfigBuilder.Tool
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, outputFilePath, buildWebConfigResult, normalizeOutput);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles); usage in future is expected
     }
 
     public static void Build(string webConfigFilePath, string outputFilePath, bool buildWebConfigResult, bool normalizeOutput, IFileSystem fileSystem)
     {
       IList<string> createdFiles = CreateRealConfigs(webConfigFilePath);
       Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigFilePath, outputFilePath, buildWebConfigResult, normalizeOutput, fileSystem);
-      RemoveRealConfigs(createdFiles);
+      // RemoveRealConfigs(createdFiles); usage in future is expected
     }
   }
 }
