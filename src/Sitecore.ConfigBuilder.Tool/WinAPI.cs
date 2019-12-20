@@ -95,6 +95,14 @@ namespace Sitecore.ConfigBuilder.Tool
           key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder\command");
           key.SetValue("", "\"" + ConfigBuilderExePath + "\" \"%1\"");
 
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigLink");
+          key.SetValue("", "Open with Sitecore Config Builder");
+          key.SetValue("Icon", ConfigBuilderExePath);
+          key.SetValue("AppliesTo", "System.FileName:\"web.config*.link\"");
+
+          key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigLink\command");
+          key.SetValue("", "\"" + ConfigBuilderExePath + "\" \"%1\"");
+
           key = classesRoot.CreateSubKey(@"*\shell\Sitecore.ConfigBuilder.ConfigDisable");
           key.SetValue("", "Disable configuration file");
           key.SetValue("Icon", ConfigBuilderExePath);
