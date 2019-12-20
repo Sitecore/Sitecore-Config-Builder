@@ -117,7 +117,16 @@ namespace Sitecore.ConfigBuilder.Tool
         var dict = new Dictionary<string, string>();
         dict.Add(string.Empty, linkPath);
         ConvertLinkToRealFile(dict);
-        result = dict[string.Empty];
+        string realFilePath = dict[string.Empty];
+
+        string originalFolder = Path.GetDirectoryName(linkPath);
+        string destFileName = Path.GetFileName(realFilePath);
+        string destFilePath = Path.Combine(originalFolder, destFileName);
+        if (!File.Exists(destFilePath))
+        {
+          File.Copy(realFilePath, destFilePath);
+        }
+        result = destFilePath;
       }
       return result;
     }
