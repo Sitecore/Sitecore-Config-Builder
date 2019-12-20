@@ -4,7 +4,9 @@
   using System.Collections.Generic;
   using System.Diagnostics;
   using System.IO;
+  using System.IO.Compression;
   using System.Linq;
+  using System.Net;
   using System.Reflection;
   using System.Runtime.Remoting.Messaging;
   using System.Windows.Forms;
@@ -19,7 +21,7 @@
   {
     #region Fields and Constants
 
-    private const string WebConfigOpenFilter = "*.config|*.config|Any file|*";
+    private const string WebConfigOpenFilter = "*.config|*.config|*.link|*.link|Any file|*";
 
     private const string SaveFilter = "*.xml|*.xml|Any file|*";
 
@@ -57,6 +59,7 @@
       try
       {
         var webConfigPath = this.FilePathTextbox.Text.Trim(" \"".ToCharArray());
+        webConfigPath = ConfigBuilderProxy.ConvertLinkToRealFile(webConfigPath);
         var buildWebConfigResult = this.BuildWebConfigResult.Checked;
         var normalizeOutput = this.NormalizeOutput.Checked;
         var requireDefaultConfiguration = this.RequireDefaultConfiguration.Checked;
@@ -77,24 +80,74 @@
           Assert.IsNotNull(outputWebConfigFile, "outputWebConfigFile");
         }
 
-        Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, false).Save(outputShowConfigFile);
+        ConfigBuilderProxy.Build(webConfigPath, false, false).Save(outputShowConfigFile);
         if (normalizeOutput)
         {
-          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
+          ConfigBuilderProxy.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
         }
 
         if (buildWebConfigResult)
         {
-          Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, false).Save(outputWebConfigFile);
+          ConfigBuilderProxy.Build(webConfigPath, true, false).Save(outputWebConfigFile);
           if (normalizeOutput)
           {
-            Sitecore.Diagnostics.ConfigBuilder.ConfigBuilder.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile));
+            ConfigBuilderProxy.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile));
           }
         }
 
         if (requireDefaultConfiguration)
         {
-          if (releaseInfo != null)
+
+
+          var websiteFolder = Path.GetDirectoryName(webConfigPath);
+          if (string.Equals(websiteFolder, Path.GetDirectoryName(outputShowConfigFile)))
+          {
+            websiteFolder += " " + releaseInfo.Version.MajorMinorUpdate;
+            webConfigPath = Path.Combine(websiteFolder, Path.GetFileName(webConfigPath));
+            outputShowConfigFile = Path.Combine(websiteFolder, Path.GetFileName(outputShowConfigFile));
+
+            Directory.Delete(websiteFolder, true);
+
+            {
+              var filesZipPath = Path.GetTempFileName();
+              new WebClient()
+                .DownloadFile(releaseInfo.DefaultDistribution.Defaults.Configs.FilesUrl, filesZipPath);
+
+              var tempFolder = Path.GetTempFileName();
+              File.Delete(tempFolder);
+              Directory.CreateDirectory(tempFolder);
+
+              ZipFile.ExtractToDirectory(filesZipPath, tempFolder);
+
+              tempFolder =
+                (
+                  Directory.GetDirectories(tempFolder, "Website", SearchOption.AllDirectories).First());
+              Directory.Move(tempFolder, websiteFolder);
+
+              var outputWebConfigFile1 = string.Empty;
+              if (buildWebConfigResult)
+              {
+                outputWebConfigFile1 = Path.Combine(websiteFolder, "web.config.result.xml");
+                Assert.IsNotNull(outputWebConfigFile1, "outputWebConfigFile");
+              }
+
+              ConfigBuilderProxy.Build(webConfigPath, false, false).Save(outputShowConfigFile);
+              if (normalizeOutput)
+              {
+                ConfigBuilderProxy.Build(webConfigPath, false, true).Save(GetNormalizedPath(outputShowConfigFile));
+              }
+
+              if (buildWebConfigResult)
+              {
+                ConfigBuilderProxy.Build(webConfigPath, true, false).Save(outputWebConfigFile1);
+                if (normalizeOutput)
+                {
+                  ConfigBuilderProxy.Build(webConfigPath, true, true).Save(GetNormalizedPath(outputWebConfigFile1));
+                }
+              }
+            }
+          }
+          else
           {
             try
             {
@@ -241,13 +294,7 @@
         {
           try
           {
-            var vList = new List<IRelease>();
-            foreach (var vv in new ServiceClient().GetVersions("Sitecore CMS").ToArray())
-            {
-              vList.AddRange(vv.Releases.Values);
-            }
-
-            return vList;
+            return ServiceClient.Create().GetVersions("Sitecore CMS").OrderByDescending(v => v.Version.MajorMinorUpdateInt);
           }
           catch (Exception ex)
           {
