@@ -130,7 +130,7 @@ namespace Sitecore.ConfigBuilder.Tool
       }
       else if (result == System.Windows.Forms.DialogResult.No)
       {
-        throw new NotImplementedException("NeverAskMeAboutContextMenu");
+        //throw new NotImplementedException("NeverAskMeAboutContextMenu");
         //NeverAskMeAboutContextMenu = true;
       }
     }
